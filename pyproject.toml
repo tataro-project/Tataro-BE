@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["wkdsh21 <wkdsh21@naver.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -44,6 +45,3 @@ ignore_errors = true
 
 [tool.django-stubs]
 django_settings_module = "config.settings.base"
-
-[tool.poetry]
-package-mode = false
