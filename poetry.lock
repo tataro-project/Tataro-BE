@@ -120,6 +120,45 @@ docs = ["furo (>=2024.8.6)", "sphinx (>=5.0)", "sphinx-notfound-page"]
 testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)", "setuptools (>=71.0.0)"]
 
 [[package]]
+name = "django-stubs"
+version = "5.1.2"
+description = "Mypy stubs for Django"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_stubs-5.1.2-py3-none-any.whl", hash = "sha256:04ddc778faded6fb48468a8da9e98b8d12b9ba983faa648d37a73ebde0f024da"},
+    {file = "django_stubs-5.1.2.tar.gz", hash = "sha256:a0fcb3659bab46a6d835cc2d9bff3fc29c36ccea41a10e8b1930427bc0f9f0df"},
+]
+
+[package.dependencies]
+asgiref = "*"
+django = "*"
+django-stubs-ext = ">=5.1.2"
+mypy = {version = ">=1.12,<1.15", optional = true, markers = "extra == \"compatible-mypy\""}
+types-PyYAML = "*"
+typing-extensions = ">=4.11.0"
+
+[package.extras]
+compatible-mypy = ["mypy (>=1.12,<1.15)"]
+oracle = ["oracledb"]
+redis = ["redis"]
+
+[[package]]
+name = "django-stubs-ext"
+version = "5.1.2"
+description = "Monkey-patching and extensions for django-stubs"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_stubs_ext-5.1.2-py3-none-any.whl", hash = "sha256:6c559214538d6a26f631ca638ddc3251a0a891d607de8ce01d23d3201ad8ad6c"},
+    {file = "django_stubs_ext-5.1.2.tar.gz", hash = "sha256:421c0c3025a68e3ab8e16f065fad9ba93335ecefe2dd92a0cff97a665680266c"},
+]
+
+[package.dependencies]
+django = "*"
+typing-extensions = "*"
+
+[[package]]
 name = "isort"
 version = "5.13.2"
 description = "A Python utility / library to sort Python imports."
@@ -256,6 +295,17 @@ dev = ["build", "hatch"]
 doc = ["sphinx"]
 
 [[package]]
+name = "types-pyyaml"
+version = "6.0.12.20241230"
+description = "Typing stubs for PyYAML"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types_PyYAML-6.0.12.20241230-py3-none-any.whl", hash = "sha256:fa4d32565219b68e6dee5f67534c722e53c00d1cfc09c435ef04d7353e1e96e6"},
+    {file = "types_pyyaml-6.0.12.20241230.tar.gz", hash = "sha256:7f07622dbd34bb9c8b264fe860a17e0efcad00d50b5f27e93984909d9363498c"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -280,4 +330,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "4004a52f079b2f957e54bf4fdce1584b23dc7af5384c6a7217d6872af8a67da7"
+content-hash = "bd3b9b0852a6a7ff2d5cd2be43561fccb4d9dd7bc938d8d41470c368f1c82293"
