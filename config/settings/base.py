@@ -40,6 +40,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # own_apps
+    "content.apps.ContentConfig",
+    "user.apps.UserConfig",
+    "tarot.apps.TarotConfig",
 ]
 
 MIDDLEWARE = [
