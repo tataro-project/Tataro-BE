@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "tataro-project"
+version = "0.1.0"
+description = ""
+authors = ["wkdsh21 <wkdsh21@naver.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "^5.1.5"
+django-environ = "^0.12.0"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.14.1"
+isort = "^5.13.2"
+black = "^24.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+python_version = 3.12
+strict = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "*.migrations.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "manage"
+ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.base"
