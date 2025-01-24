@@ -52,7 +52,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "tataro_project.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
