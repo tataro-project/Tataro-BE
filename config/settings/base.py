@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "content.apps.ContentConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
+    # 스웨거 사용
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
