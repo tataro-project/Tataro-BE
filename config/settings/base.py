@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "tarot.apps.TarotConfig",
     # third_apps
     "rest_framework",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
