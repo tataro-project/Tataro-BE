@@ -12,6 +12,14 @@ class TimeStampedModel(models.Model):
 
 
 class TaroChatRooms(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class TaroCardContents(TimeStampedModel):
+    room = models.ForeignKey(TaroChatRooms, on_delete=models.CASCADE)
     card_id = models.IntegerField()
     card_content = models.TextField()
-    category = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class TaroChatContents(TimeStampedModel):
+    room = models.ForeignKey(TaroChatRooms, on_delete=models.CASCADE)
+    content = models.TextField()
