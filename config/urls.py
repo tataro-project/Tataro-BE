@@ -16,6 +16,7 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
     patterns=[
         path("api/v1/", include("user.urls")),  # API 버전 prefix 추가
+        path("api/v1/", include("tarot.urls")),
     ],
 )
 
@@ -25,4 +26,5 @@ urlpatterns = [
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     # API 버전 prefix를 포함한 URL 패턴
     path("api/v1/", include("user.urls")),
+    path("api/v1/", include("tarot.urls")),
 ]
