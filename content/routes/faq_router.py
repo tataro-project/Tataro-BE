@@ -27,7 +27,7 @@ from user.models import User
 )
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def faq_list_or_create(request) -> Response: # type: ignore
+def faq_list_or_create(request) -> Response:  # type: ignore
     """FAQ 목록 조회 및 생성"""
     if request.method == "GET":
         faqs = FAQ.objects.all().order_by("-created_at")
@@ -63,7 +63,7 @@ def faq_list_or_create(request) -> Response: # type: ignore
 )
 @api_view(["GET", "PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
-def faq_detail_update_delete(request, faq_id) -> Response: # type: ignore
+def faq_detail_update_delete(request, faq_id) -> Response:  # type: ignore
     """FAQ 상세 조회, 수정, 삭제"""
     faq = get_object_or_404(FAQ, id=faq_id)
 
