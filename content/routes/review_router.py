@@ -1,8 +1,6 @@
-from typing import Any, cast
+from typing import cast
 
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -17,78 +15,69 @@ from user.models import User
 
 @swagger_auto_schema(
     method="get",
-    manual_parameters=[
-        openapi.Parameter("page", openapi.IN_QUERY, description="Page number", type=openapi.TYPE_INTEGER)
-    ],
+    operation_summary="리뷰 목록 조회",
+    operation_description="모든 리뷰 목록을 최신순으로 조회합니다.",
     responses={200: ReviewSerializer(many=True)},
 )
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def review_list(request: Request) -> Response:
-    """리뷰 목록 조회 (페이징 지원)"""
-    page: str = request.query_params.get("page", "1")
-    reviews = Review.objects.all().order_by("-created_at")
-    paginator = Paginator(reviews, 10)  # 페이지당 10개씩
-
-    try:
-        paginated_reviews = paginator.page(int(page))
-    except (EmptyPage, PageNotAnInteger):
-        return Response({"error": "페이지를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
-
-    serializer = ReviewSerializer(paginated_reviews, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@swagger_auto_schema(method="get", responses={200: ReviewSerializer()})
-@api_view(["GET"])
-@permission_classes([AllowAny])
-def review_detail(request: Request, review_id: int) -> Response:
-    """특정 리뷰 조회"""
-    review = get_object_or_404(Review, id=review_id)
-    review.view_count += 1
-    review.save()
-    serializer = ReviewSerializer(review)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@swagger_auto_schema(method="post", request_body=ReviewSerializer, responses={201: ReviewSerializer()})
-@api_view(["POST"])
+@swagger_auto_schema(
+    method="post",
+    operation_summary="리뷰 생성",
+    operation_description="새로운 리뷰를 생성합니다. 로그인 필요.",
+    request_body=ReviewSerializer,
+    responses={201: ReviewSerializer, 400: "잘못된 요청"},
+)
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
-def create_review(request: Request) -> Response:
-    """리뷰 작성 (로그인 필요)"""
-    serializer = ReviewSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save(user=cast(User, request.user))
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@swagger_auto_schema(method="patch", request_body=ReviewSerializer(partial=True), responses={200: ReviewSerializer()})
-@api_view(["PATCH"])
-@permission_classes([IsAuthenticated])
-def update_review(request: Request, review_id: int) -> Response:
-    """리뷰 수정 (작성자만 가능)"""
-    review = get_object_or_404(Review, id=review_id)
-
-    if cast(User, request.user) != review.user:
-        return Response({"error": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
-
-    serializer = ReviewSerializer(review, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
+def review_list_or_create(request: Request) -> Response:  # type: ignore
+    if request.method == "GET":
+        reviews = Review.objects.all().order_by("-created_at")
+        serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == "POST":
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=cast(User, request.user))
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(method="delete", responses={204: "No Content"})
-@api_view(["DELETE"])
+@swagger_auto_schema(
+    method="get",
+    operation_summary="리뷰 상세 조회",
+    operation_description="특정 리뷰의 상세 정보를 조회합니다.",
+    responses={200: ReviewSerializer, 404: "리뷰를 찾을 수 없음"},
+)
+@swagger_auto_schema(
+    method="put",
+    operation_summary="리뷰 수정",
+    operation_description="특정 리뷰의 내용을 수정합니다. 작성자만 가능.",
+    request_body=ReviewSerializer,
+    responses={200: ReviewSerializer, 403: "권한 없음", 404: "리뷰를 찾을 수 없음"},
+)
+@swagger_auto_schema(
+    method="delete",
+    operation_summary="리뷰 삭제",
+    operation_description="특정 리뷰를 삭제합니다. 작성자만 가능.",
+    responses={204: "삭제됨", 403: "권한 없음", 404: "리뷰를 찾을 수 없음"},
+)
+@api_view(["GET", "PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
-def delete_review(request: Request, review_id: int) -> Response:
-    """리뷰 삭제 (작성자만 가능)"""
+def review_detail_update_delete(request: Request, review_id: int) -> Response:  # type: ignore
     review = get_object_or_404(Review, id=review_id)
 
-    if cast(User, request.user) != review.user:
-        return Response({"error": "삭제 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
-
-    review.delete()
-    return Response({"message": "리뷰가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+    if request.method == "GET":
+        serializer = ReviewSerializer(review)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    elif request.method == "PUT":
+        if cast(User, request.user) != review.user:
+            return Response({"error": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+        serializer = ReviewSerializer(review, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == "DELETE":
+        if cast(User, request.user) != review.user:
+            return Response({"error": "삭제 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+        review.delete()
+        return Response({"message": "리뷰가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
