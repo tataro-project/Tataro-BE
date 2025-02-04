@@ -1,6 +1,9 @@
 from typing import Any, Dict
+
 from rest_framework import serializers
-from .models import TaroChatRooms, TaroCardContents, TaroChatContents
+
+from .models import TaroCardContents, TaroChatContents, TaroChatRooms
+
 
 class TaroChatContentsInitSerializer(serializers.ModelSerializer[TaroChatContents]):
     class Meta:
@@ -10,9 +13,9 @@ class TaroChatContentsInitSerializer(serializers.ModelSerializer[TaroChatContent
         fields = ["content", "created_at", "updated_at"]
         read_only_fields = ("created_at", "updated_at")
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> TaroChatContents:
         # 새로운 TaroChatRooms 객체 생성
-        user = self.context['request'].user  # 현재 요청의 사용자 가져오기
+        user = self.context["request"].user  # 현재 요청의 사용자 가져오기
         room = TaroChatRooms.objects.create(user=user)
 
         # TaroChatContents 객체 생성 및 저장
@@ -20,15 +23,14 @@ class TaroChatContentsInitSerializer(serializers.ModelSerializer[TaroChatContent
         return chat_content
 
 
-class TaroChatLogSerializer(serializers.Serializer):
+class TaroChatLogSerializer(serializers.Serializer["TaroCardContents"]):
     question = serializers.CharField()
-    content = serializers.ListField(
-        child=serializers.CharField()
-    )
+    content = serializers.ListField(child=serializers.CharField())
     card_name = serializers.CharField()
     card_url = serializers.URLField()
     card_content = serializers.CharField()
 
-class TaroChatRoomResponseSerializer(serializers.Serializer):
+
+class TaroChatRoomResponseSerializer(serializers.Serializer["TaroChatLogSerializer"]):
     room_id = serializers.IntegerField()
     chat_log = TaroChatLogSerializer(many=True)

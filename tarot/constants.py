@@ -2,17 +2,29 @@ tarot_cards = [
     # 메이저 아르카나 (0-21)
     {"name": "The Fool", "url": "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg"},
     {"name": "The Magician", "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg"},
-    {"name": "The High Priestess", "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg"},
+    {
+        "name": "The High Priestess",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg",
+    },
     {"name": "The Empress", "url": "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg"},
     {"name": "The Emperor", "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg"},
-    {"name": "The Hierophant", "url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg"},
+    {
+        "name": "The Hierophant",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg",
+    },
     {"name": "The Lovers", "url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg"},
     {"name": "The Chariot", "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg"},
     {"name": "Strength", "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg"},
     {"name": "The Hermit", "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg"},
-    {"name": "Wheel of Fortune", "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg"},
+    {
+        "name": "Wheel of Fortune",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg",
+    },
     {"name": "Justice", "url": "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg"},
-    {"name": "The Hanged Man", "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg"},
+    {
+        "name": "The Hanged Man",
+        "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg",
+    },
     {"name": "Death", "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg"},
     {"name": "Temperance", "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg"},
     {"name": "The Devil", "url": "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg"},
@@ -22,7 +34,6 @@ tarot_cards = [
     {"name": "The Sun", "url": "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg"},
     {"name": "Judgment", "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg"},
     {"name": "The World", "url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg"},
-
     # 웨이드 (Wands) 23-36
     {"name": "Ace of Wands", "url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Wands01.jpg"},
     {"name": "Two of Wands", "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Wands02.jpg"},
@@ -38,7 +49,6 @@ tarot_cards = [
     {"name": "Knight of Wands", "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Wands12.jpg"},
     {"name": "Queen of Wands", "url": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Wands13.jpg"},
     {"name": "King of Wands", "url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Wands14.jpg"},
-
     # 컵 (Cups) 37-50
     {"name": "Ace of Cups", "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Cups01.jpg"},
     {"name": "Two of Cups", "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Cups02.jpg"},
@@ -54,7 +64,6 @@ tarot_cards = [
     {"name": "Knight of Cups", "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Cups12.jpg"},
     {"name": "Queen of Cups", "url": "https://upload.wikimedia.org/wikipedia/commons/6/62/Cups13.jpg"},
     {"name": "King of Cups", "url": "https://upload.wikimedia.org/wikipedia/commons/0/04/Cups14.jpg"},
-
     # 소드 (Swords) 51-64
     {"name": "Ace of Swords", "url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Swords01.jpg"},
     {"name": "Two of Swords", "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Swords02.jpg"},
@@ -70,7 +79,6 @@ tarot_cards = [
     {"name": "Knight of Swords", "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Swords12.jpg"},
     {"name": "Queen of Swords", "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Swords13.jpg"},
     {"name": "King of Swords", "url": "https://upload.wikimedia.org/wikipedia/commons/3/33/Swords14.jpg"},
-
     # 펜타클 (Pentacles) 65-78
     {"name": "Ace of Pentacles", "url": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Pents01.jpg"},
     {"name": "Two of Pentacles", "url": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Pents02.jpg"},
@@ -85,5 +93,5 @@ tarot_cards = [
     {"name": "Page of Pentacles", "url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Pents11.jpg"},
     {"name": "Knight of Pentacles", "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Pents12.jpg"},
     {"name": "Queen of Pentacles", "url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Pents13.jpg"},
-    {"name": "King of Pentacles", "url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Pents14.jpg"}
+    {"name": "King of Pentacles", "url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Pents14.jpg"},
 ]
