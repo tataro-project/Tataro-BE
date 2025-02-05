@@ -42,7 +42,6 @@ class Notice(BaseModel):
 class Notification(BaseModel):
     title = models.CharField(max_length=255)
     content = models.TextField()
-    img_url = models.CharField(max_length=255)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
     # Other fields...
 

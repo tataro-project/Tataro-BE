@@ -8,6 +8,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from content.models import Notice
+from content.pagination import CustomPageNumberPagination
 from content.serializers import NoticeSerializer
 
 User = get_user_model()
@@ -32,8 +33,10 @@ def notice_list_or_create(request: Request) -> Response:  # type: ignore
     """공지사항 목록 조회 (GET) 및 공지사항 생성 (POST)"""
     if request.method == "GET":  # 공지사항 목록 조회
         notices = Notice.objects.all().order_by("-order", "-created_at")  # order 순 정렬, 최신순
-        serializer = NoticeSerializer(notices, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
+        paginated_faqs = paginator.paginate_queryset(notices, request)  # 페이지네이션 적용
+        serializer = NoticeSerializer(paginated_faqs, many=True)
+        return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
 
     elif request.method == "POST":  # 공지사항 생성
         serializer = NoticeSerializer(data=request.data)

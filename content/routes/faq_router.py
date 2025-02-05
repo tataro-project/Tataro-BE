@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from content.models import FAQ
+from content.pagination import CustomPageNumberPagination
 from content.serializers import FAQSerializer
 from user.models import User
 
@@ -31,8 +32,10 @@ def faq_list_or_create(request) -> Response:  # type: ignore
     """FAQ 목록 조회 및 생성"""
     if request.method == "GET":
         faqs = FAQ.objects.all().order_by("-created_at")
-        serializer = FAQSerializer(faqs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
+        paginated_faqs = paginator.paginate_queryset(faqs, request)  # 페이지네이션 적용
+        serializer = FAQSerializer(paginated_faqs, many=True)
+        return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
 
     elif request.method == "POST":
         serializer = FAQSerializer(data=request.data)

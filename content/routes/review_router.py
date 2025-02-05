@@ -9,6 +9,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from content.models import Review
+from content.pagination import CustomPageNumberPagination
 from content.serializers import ReviewSerializer
 from user.models import User
 
@@ -27,12 +28,15 @@ from user.models import User
     responses={201: ReviewSerializer, 400: "잘못된 요청"},
 )
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
-def review_list_or_create(request: Request) -> Response:  # type: ignore
+# @permission_classes([IsAuthenticated])
+def review_list_or_create(request: Request) -> Response: # type: ignore
     if request.method == "GET":
         reviews = Review.objects.all().order_by("-created_at")
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
+        paginated_reviews = paginator.paginate_queryset(reviews, request)  # 페이지네이션 적용
+        serializer = ReviewSerializer(paginated_reviews, many=True)
+        return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
+
     elif request.method == "POST":
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid():
@@ -61,11 +65,12 @@ def review_list_or_create(request: Request) -> Response:  # type: ignore
     responses={204: "삭제됨", 403: "권한 없음", 404: "리뷰를 찾을 수 없음"},
 )
 @api_view(["GET", "PUT", "DELETE"])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def review_detail_update_delete(request: Request, review_id: int) -> Response:  # type: ignore
     review = get_object_or_404(Review, id=review_id)
 
     if request.method == "GET":
+        review.increase_view_count()
         serializer = ReviewSerializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == "PUT":
