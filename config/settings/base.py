@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 import environ
+from dotenv import load_dotenv
 
 env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
     # own_apps
     "content.apps.ContentConfig",
     "user.apps.UserConfig",
@@ -51,13 +51,10 @@ INSTALLED_APPS = [
 ]
 
 # .env 파일 로드
-environ.Env.read_env(os.path.join(BASE_DIR, ".env.dev"))
+load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env.dev"))
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 KAKAO_REDIRECT_URI = os.getenv("KAKAO_REDIRECT_URI")
-
-# NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
-# NAVER_REDIRECT_URI = os.getenv("NAVER_REDIRECT_URI")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
