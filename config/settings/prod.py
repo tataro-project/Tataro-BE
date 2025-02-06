@@ -3,6 +3,9 @@ from .base import *
 DEBUG = False
 env.read_env(BASE_DIR / "config/.env.prod")
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env("SECRET_KEY")
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
