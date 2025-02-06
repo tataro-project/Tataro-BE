@@ -1,8 +1,10 @@
-import boto3
 import uuid
+
+import boto3
 from django.conf import settings
 
-def upload_to_ncp(file):
+
+def upload_to_ncp(file): # type: ignore
     """NCP Object Storage에 파일을 업로드하고 URL을 반환"""
     ncp_config = settings.NCP_STORAGE
     s3_client = boto3.client(

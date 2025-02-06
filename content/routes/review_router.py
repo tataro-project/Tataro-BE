@@ -29,7 +29,7 @@ from user.models import User
 )
 @api_view(["GET", "POST"])
 # @permission_classes([IsAuthenticated])
-def review_list_or_create(request: Request) -> Response: # type: ignore
+def review_list_or_create(request: Request) -> Response:  # type: ignore
     if request.method == "GET":
         reviews = Review.objects.all().order_by("-created_at")
         paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
