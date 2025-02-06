@@ -9,10 +9,10 @@ env.read_env(BASE_DIR / "config/.env.prod")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME"),
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD"),
-        "HOST": env("DB_HOST", default="localhost"),
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("DB_HOST", default="db"),
         "PORT": env("DB_PORT", default="5432"),
     }
 }
