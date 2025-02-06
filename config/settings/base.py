@@ -10,9 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import environ
+from dotenv import load_dotenv
 
 env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -47,6 +49,12 @@ INSTALLED_APPS = [
     "drf_yasg",
     "channels",  # Django Channels 추가
 ]
+
+# .env 파일 로드
+load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env.dev"))
+
+KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
+KAKAO_REDIRECT_URI = os.getenv("KAKAO_REDIRECT_URI")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
