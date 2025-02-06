@@ -51,10 +51,13 @@ INSTALLED_APPS = [
 ]
 
 # .env 파일 로드
-environ.Env.read_env(os.path.join(BASE_DIR, '.env.dev'))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env.dev"))
 
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 KAKAO_REDIRECT_URI = os.getenv("KAKAO_REDIRECT_URI")
+
+# NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
+# NAVER_REDIRECT_URI = os.getenv("NAVER_REDIRECT_URI")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

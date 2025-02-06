@@ -5,6 +5,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from user.models import User
+
 
 class KakaoLoginView(APIView):
     @swagger_auto_schema(  # type: ignore
@@ -65,8 +67,7 @@ class KakaoCallbackView(APIView):
         # 사용자 정보 반환 (또는 데이터베이스 처리)
         return Response(
             {
-                "id": user_info.get("id"),
-                "email": user_info.get("kakao_account", {}).get("email"),
-                "nickname": user_info.get("properties", {}).get("nickname"),
+                "user_id": User.id,
+                "nickname": User.nickname,
             }
         )
