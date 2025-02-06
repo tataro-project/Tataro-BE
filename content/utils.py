@@ -4,7 +4,7 @@ import boto3
 from django.conf import settings
 
 
-def upload_to_ncp(file):  # type: ignore
+def upload_to_ncp(cate: str, file):  # type: ignore
     """NCP Object Storage에 파일을 업로드하고 URL을 반환"""
     ncp_config = settings.NCP_STORAGE
     s3_client = boto3.client(
@@ -15,7 +15,7 @@ def upload_to_ncp(file):  # type: ignore
     )
 
     file_extension = file.name.split(".")[-1]
-    file_name = f"reviews/{uuid.uuid4()}.{file_extension}"  # 고유한 파일명 생성
+    file_name = f"content/{cate}/{uuid.uuid4()}.{file_extension}"  # 고유한 파일명 생성
 
     s3_client.upload_fileobj(
         file,

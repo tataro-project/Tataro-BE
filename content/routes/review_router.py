@@ -1,5 +1,6 @@
 from typing import cast
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -11,6 +12,7 @@ from rest_framework.response import Response
 from content.models import Review
 from content.pagination import CustomPageNumberPagination
 from content.serializers import ReviewSerializer
+from content.utils import upload_to_ncp
 from user.models import User
 
 
@@ -38,6 +40,13 @@ def review_list_or_create(request: Request) -> Response:  # type: ignore
         return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
 
     elif request.method == "POST":
+        data = request.data.copy()
+        file = request.FILES.get("image")  # 프론트에서 "image" 필드로 파일을 전송해야 함
+        cate = "review"
+        if file and isinstance(file, InMemoryUploadedFile):
+            img_url = upload_to_ncp(cate, file)  # 네이버 클라우드에 업로드 후 URL 반환
+            data["img_url"] = img_url
+
         serializer = ReviewSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=cast(User, request.user))
