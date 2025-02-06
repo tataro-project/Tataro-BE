@@ -14,7 +14,7 @@
   </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Python 3.12.7 WSL (Ubuntu-22.04): (/home/jang/.cache/pypoetry/virtualenvs/tataro-project-jn1SXzOW-py3.12/bin/python)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Poetry (Tataro-BE)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
