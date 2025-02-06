@@ -1,4 +1,4 @@
-from models import FAQ
+from .models import FAQ
 from rest_framework import serializers
 
 

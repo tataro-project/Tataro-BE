@@ -1,4 +1,4 @@
-from models import Notice
+from .models import Notice
 from rest_framework import serializers
 
 
