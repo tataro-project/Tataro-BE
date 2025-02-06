@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     "tarot.apps.TarotConfig",
     # third_apps
     "rest_framework",
-    # 스웨거 사용
     "drf_yasg",
+    "channels",  # Django Channels 추가
 ]
 
 MIDDLEWARE = [
@@ -79,6 +79,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
 
 
 # Password validation
@@ -123,11 +134,29 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    ],
+    # "DEFAULT_AUTHENTICATION_CLASSES": [
+    #     "rest_framework.authentication.BasicAuthentication",
+    #     "rest_framework.authentication.SessionAuthentication",
+    # ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",
     ],
+}
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Redis 서버 주소
+        },
+    },
+}
+
+# 네이버 클라우드 스토리지 (사진 업로드)
+NCP_STORAGE = {
+    "ACCESS_KEY": "ncp_iam_BPASKR21HXj43Lue9aH2",
+    "SECRET_KEY": "ncp_iam_BPKSKRKATwxEGIVhUGyNtpl4fwfyu3qhwo",
+    "BUCKET_NAME": "tataro-content",
+    "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
 }

@@ -3,5 +3,11 @@
   <component name="Black">
     <option name="sdkName" value="Poetry (tataro_project)" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (Tataro-BE)" project-jdk-type="Python SDK" />
+  <component name="PythonCompatibilityInspectionAdvertiser">
+    <option name="version" value="3" />
+  </component>
+
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12.7 WSL (Ubuntu-22.04): (/home/jang/.cache/pypoetry/virtualenvs/tataro-project-jn1SXzOW-py3.12/bin/python)" project-jdk-type="Python SDK" />
+
 </project>
