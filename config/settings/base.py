@@ -46,8 +46,12 @@ INSTALLED_APPS = [
     "tarot.apps.TarotConfig",
     # third_apps
     "rest_framework",
+
     "drf_yasg",
     "channels",  # Django Channels 추가
+
+    # 스웨거 사용
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -80,6 +84,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -89,6 +94,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
 
 
 # Password validation
