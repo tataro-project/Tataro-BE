@@ -164,3 +164,7 @@ NCP_STORAGE = {
     "BUCKET_NAME": "tataro-content",
     "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
 }
+
+SWAGGER_SETTINGS = {
+'USE_SESSION_AUTH': False
+}
