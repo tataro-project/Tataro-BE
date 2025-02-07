@@ -16,3 +16,5 @@ DATABASES = {
         "PORT": env("DB_PORT", default="5432"),
     }
 }
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
