@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg",
     "channels",  # Django Channels 추가
+    "corsheaders",
 ]
 
 # .env 파일 로드
@@ -73,7 +74,17 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    #추가
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://hakunamatatarot.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "config.urls"
 
