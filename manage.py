@@ -3,13 +3,6 @@
 import os
 import sys
 
-import environ
-
-# 환경변수 로딩을 위해 manage.py 에 아래의 변수 추가 및 env 파일 로딩
-env = environ.Env()
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
-
 
 def main():
     """Run administrative tasks."""
