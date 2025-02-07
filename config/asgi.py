@@ -9,26 +9,19 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 
 import os
 
+from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
-from django.core.wsgi import get_wsgi_application
-from django.urls import path
 
-from content.consumers import NotificationConsumer
+from notification.urls import websocket_urlpatterns
 
 environment = os.getenv("DJANGO_ENV", "dev")  # 기본값은 dev
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{environment}")
 
-wsgi_application = get_wsgi_application()
-
 # ASGI 애플리케이션 (웹소켓)
 application = ProtocolTypeRouter(
     {
-        "http": wsgi_application,  # 일반 HTTP 요청은 WSGI로 처리
-        "websocket": URLRouter(
-            [
-                path("ws/notifications/", NotificationConsumer.as_asgi()),
-            ]
-        ),
+        "http": get_asgi_application(),  # 기존 WSGI 기반 앱 유지
+        "websocket": AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),  # 웹소켓은 ASGI 사용
     }
 )

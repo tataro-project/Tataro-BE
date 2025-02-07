@@ -7,9 +7,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from content.models import FAQ
-from content.pagination import CustomPageNumberPagination
-from content.serializers import FAQSerializer
+from faq.models import FAQ
+from faq.serializers import FAQSerializer
+from helpers.pagination import CustomPageNumberPagination
 from user.models import User
 
 

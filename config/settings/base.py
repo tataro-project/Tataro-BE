@@ -16,16 +16,22 @@ from pathlib import Path
 import environ
 from dotenv import load_dotenv
 
-env = environ.Env()
+# 환경 변수 로드
+env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-
+# environ.Env.read_env()
+env_path = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_path):
+    environ.Env.read_env(env_path)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-95sec@$!p*@98ns5c-5#22u$o%4mnvr8y6i(_%2agq9*%nuokh"
+SECRET_KEY = env("SECRET_KEY")
 
 
 ALLOWED_HOSTS: list[str] = []
@@ -41,7 +47,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # own_apps
-    "content.apps.ContentConfig",
+    "review.apps.ReviewConfig",
+    "notice.apps.NoticeConfig",
+    "notification.apps.NotificationConfig",
+    "faq.apps.FaqConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
     # third_apps
@@ -150,8 +159,8 @@ CHANNEL_LAYERS = {
 
 # 네이버 클라우드 스토리지 (사진 업로드)
 NCP_STORAGE = {
-    "ACCESS_KEY": "ncp_iam_BPASKR21HXj43Lue9aH2",
-    "SECRET_KEY": "ncp_iam_BPKSKRKATwxEGIVhUGyNtpl4fwfyu3qhwo",
+    "ACCESS_KEY": env("NCP_ACCESS_KEY"),
+    "SECRET_KEY": env("NCP_SECRET_KEY"),
     "BUCKET_NAME": "tataro-content",
     "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
 }
