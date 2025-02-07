@@ -23,4 +23,4 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-dev
 
 
-CMD ["sh", "-c", "poetry lock --no-update && poetry install && poetry run python manage.py makemigrations && poetry run python manage.py migrate && poetry run gunicorn --bind 0.0.0.0:8000 dbre_BE.wsgi:application"]
+CMD ["sh", "-c", "poetry lock --no-update && poetry install && poetry run python manage.py makemigrations && poetry run python manage.py migrate && poetry run gunicorn --bind 0.0.0.0:8000 config.asgi:application"]
