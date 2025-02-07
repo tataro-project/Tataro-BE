@@ -22,6 +22,7 @@ services:
       - ./:/app
     environment:
       - DJANGO_ENV=prod
+      - DJANGO_SETTINGS_MODULE=config.settings.prod
       - CLIENT_MAX_BODY_SIZE=10M
     depends_on:
       db:
