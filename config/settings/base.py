@@ -34,7 +34,7 @@ if os.path.exists(env_path):
 SECRET_KEY = env("SECRET_KEY")
 
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = ["*"]
 
 
 # Application definition
