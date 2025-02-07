@@ -22,6 +22,8 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
+from notification.consumers import NotificationConsumer
+
 schema_view = get_schema_view(
     openapi.Info(
         title="리뷰 API",
@@ -42,5 +44,6 @@ urlpatterns = [
     path("api/v1/review/", include("review.urls")),
     path("api/v1/notice/", include("notice.urls")),
     path("api/v1/faq/", include("faq.urls")),
+    path("ws/notifications/", NotificationConsumer.as_asgi()),
     # path("api/v1/", include("user.urls")),
 ]

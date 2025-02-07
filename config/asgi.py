@@ -10,11 +10,10 @@ https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 import os
 
 from channels.routing import ProtocolTypeRouter, URLRouter
+from content.consumers import NotificationConsumer
 from django.core.asgi import get_asgi_application
 from django.core.wsgi import get_wsgi_application
 from django.urls import path
-
-from content.consumers import NotificationConsumer
 
 environment = os.getenv("DJANGO_ENV", "dev")  # 기본값은 dev
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{environment}")

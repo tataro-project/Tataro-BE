@@ -1,4 +1,5 @@
 from django.urls import path
+
 from notice.views import notice_detail_update_delete, notice_list_or_create
 
 urlpatterns = [

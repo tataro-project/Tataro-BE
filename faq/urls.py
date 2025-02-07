@@ -1,4 +1,5 @@
 from django.urls import path
+
 from faq.views import faq_detail_update_delete, faq_list_or_create
 
 urlpatterns = [

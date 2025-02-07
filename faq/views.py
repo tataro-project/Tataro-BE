@@ -2,15 +2,14 @@ from typing import cast
 
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
-
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from faq.models import FAQ
 from faq.serializers import FAQSerializer
-
-from content.pagination import CustomPageNumberPagination
+from helpers.pagination import CustomPageNumberPagination
 from user.models import User
 
 
