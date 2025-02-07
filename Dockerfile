@@ -23,4 +23,4 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --no-dev
 
 
-CMD ["sh", "-c", "poetry lock --no-update && poetry install && poetry run python manage.py collectstatic && poetry run python manage.py makemigrations && poetry run python manage.py migrate && poetry run uvicorn config.asgi:application --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "poetry lock --no-update && poetry install && poetry run python manage.py collectstatic --noinput && poetry run python manage.py makemigrations && poetry run python manage.py migrate && poetry run uvicorn config.asgi:application --host 0.0.0.0 --port 8000"]
