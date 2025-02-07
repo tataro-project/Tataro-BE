@@ -10,6 +10,7 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - /etc/letsencrypt:/etc/nginx/ssl
+      - ./staticfiles:/app/staticfiles
     depends_on:
       - web
     restart: always
