@@ -9,11 +9,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from content.models import Review
-from content.pagination import CustomPageNumberPagination
-from content.serializers import ReviewSerializer
-from content.utils import upload_to_ncp
+from helpers.pagination import CustomPageNumberPagination
+from helpers.utils import upload_to_ncp
 from user.models import User
+
+from .models import Review
+from .serializers import ReviewSerializer
 
 
 @swagger_auto_schema(
@@ -30,7 +31,7 @@ from user.models import User
     responses={201: ReviewSerializer, 400: "잘못된 요청"},
 )
 @api_view(["GET", "POST"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def review_list_or_create(request: Request) -> Response:  # type: ignore
     if request.method == "GET":
         reviews = Review.objects.all().order_by("-created_at")
@@ -74,7 +75,7 @@ def review_list_or_create(request: Request) -> Response:  # type: ignore
     responses={204: "삭제됨", 403: "권한 없음", 404: "리뷰를 찾을 수 없음"},
 )
 @api_view(["GET", "PUT", "DELETE"])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def review_detail_update_delete(request: Request, review_id: int) -> Response:  # type: ignore
     review = get_object_or_404(Review, id=review_id)
 

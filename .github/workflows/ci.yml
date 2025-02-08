@@ -9,16 +9,19 @@ jobs:
       DB_HOST: localhost
       DB_PORT: 5432
       DB_USER: postgres
-      DB_PASSWORD: "0000"
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       DB_DATABASE: tataro
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      NCP_ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+      NCP_SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
     services:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "0000"
-          POSTGRES_DB: tataro
+          POSTGRES_USER: ${{ env.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ env.DB_DATABASE }}
         ports:
           - 5432:5432
         options: >-
@@ -29,11 +32,11 @@ jobs:
 
     steps:
       - name: Check out the codes
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup python environment
         id: setup-python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.12
 
@@ -60,9 +63,17 @@ jobs:
           poetry run isort . --check --diff
 
       - name: Run Mypy
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          NCP_ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+          NCP_SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           poetry run mypy .
 
       - name: Test python project
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          NCP_ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+          NCP_SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: |
           poetry run python manage.py test

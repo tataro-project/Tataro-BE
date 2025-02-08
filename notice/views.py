@@ -7,9 +7,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from content.models import Notice
-from content.pagination import CustomPageNumberPagination
-from content.serializers import NoticeSerializer
+from helpers.pagination import CustomPageNumberPagination
+
+from .models import Notice
+from .serializers import NoticeSerializer
 
 User = get_user_model()
 

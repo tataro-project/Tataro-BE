@@ -2,14 +2,14 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
+from models import Notification
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from serializers import NotificationSerializer
 
-from content.models import Notification
-from content.serializers import NotificationSerializer
 from user.models import User
 
 
