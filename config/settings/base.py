@@ -16,12 +16,10 @@ from pathlib import Path
 import environ
 from dotenv import load_dotenv
 
-# 환경 변수 로드
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 # environ.Env.read_env()
 env_path = os.path.join(BASE_DIR, ".env")
