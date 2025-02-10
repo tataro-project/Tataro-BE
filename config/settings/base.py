@@ -16,12 +16,10 @@ from pathlib import Path
 import environ
 from dotenv import load_dotenv
 
-# 환경 변수 로드
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 # environ.Env.read_env()
 env_path = os.path.join(BASE_DIR, ".env")
@@ -159,8 +157,8 @@ CHANNEL_LAYERS = {
 
 # 네이버 클라우드 스토리지 (사진 업로드)
 NCP_STORAGE = {
-    "ACCESS_KEY": env("NCP_ACCESS_KEY"),
-    "SECRET_KEY": env("NCP_SECRET_KEY"),
+    "ACCESS_KEY": "ncp_iam_BPASKR21HXj43Lue9aH2",
+    "SECRET_KEY": "ncp_iam_BPKSKRKATwxEGIVhUGyNtpl4fwfyu3qhwo",
     "BUCKET_NAME": "tataro-content",
     "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
 }

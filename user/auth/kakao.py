@@ -9,9 +9,7 @@ from user.models import User
 
 
 class KakaoLoginView(APIView):
-    @swagger_auto_schema(  # type: ignore
-        operation_description="카카오 로그인 URL 반환", responses={200: "로그인 URL 반환 성공"}
-    )
+    @swagger_auto_schema(operation_description="카카오 로그인 URL 반환", responses={200: "로그인 URL 반환 성공"})
     def get(self, request: Request) -> Response:
         kakao_auth_url = (
             f"https://kauth.kakao.com/oauth/authorize?"
@@ -23,7 +21,7 @@ class KakaoLoginView(APIView):
 
 
 class KakaoCallbackView(APIView):
-    @swagger_auto_schema(  # type: ignore
+    @swagger_auto_schema(
         operation_description="카카오 로그인 콜백 처리",
         responses={200: "사용자 정보 반환", 400: "Authorization code is missing"},
     )
