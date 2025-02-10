@@ -5,7 +5,7 @@ from .auth.kakao import KakaoCallbackView, KakaoLoginView
 # from .auth.naver import NaverSocialLoginView, NaverTokenReissueView
 from .auth.views import LogoutView
 from .questionnaire.views import QuestionnaireView
-from .views import UserView  # type: ignore
+from .views import UserView
 
 urlpatterns = [
     path("user/", UserView.as_view()),
