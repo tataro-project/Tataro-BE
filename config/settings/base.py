@@ -157,8 +157,8 @@ CHANNEL_LAYERS = {
 
 # 네이버 클라우드 스토리지 (사진 업로드)
 NCP_STORAGE = {
-    "ACCESS_KEY": "ncp_iam_BPASKR21HXj43Lue9aH2",
-    "SECRET_KEY": "ncp_iam_BPKSKRKATwxEGIVhUGyNtpl4fwfyu3qhwo",
+    "ACCESS_KEY": env("NCP_ACCESS_KEY"),
+    "SECRET_KEY": env("NCP_SECRET_KEY"),
     "BUCKET_NAME": "tataro-content",
     "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
 }
