@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "notice.apps.NoticeConfig",
     "notification.apps.NotificationConfig",
     "faq.apps.FaqConfig",
+    "product.apps.ProductConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
     # third_apps
@@ -138,12 +139,8 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    # "DEFAULT_AUTHENTICATION_CLASSES": [
-    #     "rest_framework.authentication.BasicAuthentication",
-    #     "rest_framework.authentication.SessionAuthentication",
-    # ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",
     ],
 }
 

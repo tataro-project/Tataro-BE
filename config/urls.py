@@ -41,9 +41,13 @@ urlpatterns = [
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("admin/", admin.site.urls),
     # path("api/v1/", include("tarot.urls")),
+    # content path
     path("api/v1/review/", include("review.urls")),
     path("api/v1/notice/", include("notice.urls")),
     path("api/v1/faq/", include("faq.urls")),
+    # product path
+    path("api/v1/product/", include("product.urls")),  # product 앱 추가
+    # notification path
     path("ws/notifications/", NotificationConsumer.as_asgi()),
     # path("api/v1/", include("user.urls")),
 ]
