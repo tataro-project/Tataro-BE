@@ -71,7 +71,6 @@ class KakaoCallbackView(APIView):
         # 사용자 정보 추출
         kakao_account = user_info.get("kakao_account", {})
         profile = kakao_account.get("profile", {})
-
         nickname = profile.get("nickname")
         email = kakao_account.get("email")
         gender = kakao_account.get("gender")  # male 또는 female
@@ -81,15 +80,20 @@ class KakaoCallbackView(APIView):
         user, created = User.objects.update_or_create(
             email=email,
             defaults={
+                "social_type": "KAKAO",
                 "nickname": nickname,
                 "gender": gender,
                 "birth": birth,
             },
         )
 
+        refresh = RefreshToken.for_user(user)  # type: ignore
+
         # 응답 반환
         return Response(
             {
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
                 "message": "User information retrieved successfully",
                 "user_id": user.id,
                 "created": created,

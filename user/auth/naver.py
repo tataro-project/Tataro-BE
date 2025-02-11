@@ -64,15 +64,20 @@ class NaverCallbackView(APIView):
         user, created = User.objects.update_or_create(
             email=email,
             defaults={
+                "social_type": "NAVER",
                 "nickname": nickname,
                 "gender": gender,
                 "birth": birth,
             },
         )
 
+        refresh = RefreshToken.for_user(user)  # type: ignore
+
         # 응답 반환
         return Response(
             {
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
                 "message": "User information retrieved successfully",
                 "user_id": user.id,
                 "created": created,
