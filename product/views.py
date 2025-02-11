@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from helpers.utils import upload_to_ncp, delete_from_ncp
+from helpers.utils import delete_from_ncp, upload_to_ncp
 
 from .models import Product
 from .serializers import ProductSerializer

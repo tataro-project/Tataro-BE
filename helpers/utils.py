@@ -24,7 +24,8 @@ def upload_to_ncp(cate: str, file):  # type: ignore
 
     return f"{ncp_config['ENDPOINT_URL']}/{ncp_config['BUCKET_NAME']}/{file_name}"
 
-def delete_from_ncp(file_url: str):
+
+def delete_from_ncp(file_url: str): # type: ignore
     """NCP Object Storage에서 파일 삭제"""
     ncp_config = settings.NCP_STORAGE
     s3_client = boto3.client(
