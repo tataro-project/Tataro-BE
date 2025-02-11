@@ -18,16 +18,16 @@ class TarotInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
     serializer_class = TaroChatContentsInitSerializer
 
     def create(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response:
+        chat_content = None
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            chat_content = serializer.save()
         content = request.data.get("content")
         if isinstance(content, str):
             prompt = TaroChatContents.init_tarot_prompt(content)
             print("prompt=", prompt)
-            init_serializer = self.get_serializer(data={"content": prompt})
+            init_serializer = self.get_serializer(data={"content": prompt}, context={"room_id": chat_content.id})
             if init_serializer.is_valid(raise_exception=True):
-                init_serializer.validated_data["room"] = serializer.data.get("room")
                 init_serializer.save()
             return Response(init_serializer.data, status=status.HTTP_201_CREATED)
         else:

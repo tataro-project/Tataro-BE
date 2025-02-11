@@ -149,7 +149,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-        "rest_framework.permissions.AllowAny",  # 또는 필요한 다른 권한 설정
+        # "rest_framework.permissions.AllowAny",  # 또는 필요한 다른 권한 설정
     ],
     # "DEFAULT_AUTHENTICATION_CLASSES": [
     #     "rest_framework.authentication.BasicAuthentication",
