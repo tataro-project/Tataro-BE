@@ -58,12 +58,6 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
 ]
 
-# .env 파일 로드
-KAKAO_REST_API_KEY = env("KAKAO_REST_API_KEY")
-KAKAO_REDIRECT_URI = env("KAKAO_REDIRECT_URI")
-NAVER_CLIENT_ID = env("NAVER_CLIENT_ID")
-NAVER_CLIENT_SECRET = env("NAVER_CLIENT_SECRET")
-NAVER_REDIRECT_URI = env("NAVER_REDIRECT_URI")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

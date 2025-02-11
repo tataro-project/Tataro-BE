@@ -20,6 +20,7 @@ jobs:
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       NAVER_REDIRECT_URI: ${{ secrets.NAVER_REDIRECT_URI }}
 
+
     services:
       postgres:
         image: postgres:latest
