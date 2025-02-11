@@ -53,6 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install --no-root
+          poetry add python-dotenv 
 
       - name: Run black
         run: |
