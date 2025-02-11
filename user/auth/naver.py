@@ -6,6 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from config.settings.base import env
 from user.models import User
 
 
@@ -16,8 +17,8 @@ class NaverLoginView(APIView):
         # 네이버 로그인 URL 생성
         naver_login_url = (
             f"https://nid.naver.com/oauth2.0/authorize?"
-            f"response_type=code&client_id={settings.NAVER_CLIENT_ID}"
-            f"&redirect_uri={settings.NAVER_REDIRECT_URI}&state=random_state_string"
+            f"response_type=code&client_id={env("NAVER_CLIENT_ID")}"
+            f"&redirect_uri={env("NAVER_REDIRECT_URI")}&state=random_state_string"
         )
         return Response({"naver_login_url": naver_login_url}, status=status.HTTP_200_OK)
 
@@ -33,8 +34,8 @@ class NaverCallbackView(APIView):
         # 액세스 토큰 요청
         token_url = (
             f"https://nid.naver.com/oauth2.0/token?"
-            f"grant_type=authorization_code&client_id={settings.NAVER_CLIENT_ID}"
-            f"&client_secret={settings.NAVER_CLIENT_SECRET}&code={code}&state={state}"
+            f"grant_type=authorization_code&client_id={env("NAVER_CLIENT_ID")}"
+            f"&client_secret={env("NAVER_CLIENT_SECRET")}&code={code}&state={state}"
         )
         token_response = requests.get(token_url)
         token_data = token_response.json()

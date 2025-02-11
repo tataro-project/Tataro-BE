@@ -4,5 +4,5 @@ from tarot.views import TarotGenerateViewSet, TarotInitViewSet
 
 urlpatterns = [
     path("init/", TarotInitViewSet.as_view({"post": "create"}), name="tarot-init"),
-    # path("<int:pk>/", TarotGenerateViewSet.as_view({"post":"create"}), name="tarot_generate"),
+    path("<int:pk>/", TarotGenerateViewSet.as_view({"post": "create"}), name="tarot_generate"),
 ]

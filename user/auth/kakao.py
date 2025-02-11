@@ -1,5 +1,4 @@
 import requests
-from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -7,6 +6,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from config.settings.base import env
 from user.models import User
 
 
@@ -17,8 +17,8 @@ class KakaoLoginView(APIView):
     def get(self, request: Request) -> Response:
         kakao_auth_url = (
             f"https://kauth.kakao.com/oauth/authorize?"
-            f"client_id={settings.KAKAO_REST_API_KEY}&"
-            f"redirect_uri={settings.KAKAO_REDIRECT_URI}&"
+            f"client_id={env("KAKAO_REST_API_KEY")}&"
+            f"redirect_uri={env("KAKAO_REDIRECT_URI")}&"
             f"response_type=code"
         )
         return Response({"auth_url": kakao_auth_url}, status=status.HTTP_200_OK)
@@ -41,8 +41,8 @@ class KakaoCallbackView(APIView):
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {
             "grant_type": "authorization_code",
-            "client_id": settings.KAKAO_REST_API_KEY,
-            "redirect_uri": settings.KAKAO_REDIRECT_URI,
+            "client_id": env("KAKAO_REST_API_KEY"),
+            "redirect_uri": env("KAKAO_REDIRECT_URI"),
             "code": code,
         }
 
