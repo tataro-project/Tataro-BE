@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg",
     "channels",  # Django Channels 추가
-    "rest_framework_simplejwt",
 ]
 
 # .env 파일 로드
