@@ -1,9 +1,10 @@
+from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from helpers.utils import upload_to_ncp
+from helpers.utils import upload_to_ncp, delete_from_ncp
 
 from .models import Product
 from .serializers import ProductSerializer
@@ -74,4 +75,15 @@ class ProductViewSet(viewsets.ModelViewSet):  # type: ignore
         responses={204: "삭제 성공"},
     )
     def destroy(self, request, *args, **kwargs) -> Response:  # type: ignore
-        return super().destroy(request, *args, **kwargs)
+        """
+        상품 삭제 시 관련 이미지도 NCP Object Storage에서 삭제
+        """
+        product = get_object_or_404(Product, pk=kwargs["pk"])
+
+        # 이미지가 있으면 NCP에서 삭제
+        if product.img_url:
+            delete_from_ncp(product.img_url)
+
+        # 상품 삭제
+        self.perform_destroy(product)
+        return Response({"message": "상품 및 이미지 삭제 완료"}, status=status.HTTP_204_NO_CONTENT)
