@@ -22,4 +22,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # type:ignore
 SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,
     "DEFAULT_API_URL": "https://hakunamatatarot.com",  # HTTPS URL로 명시
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {  # JWT 인증 방식 정의
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": 'JWT Authorization header using the Bearer scheme. Example: "Authorization: Bearer {token}"',
+        },
+    },
 }
