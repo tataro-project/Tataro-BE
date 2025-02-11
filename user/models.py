@@ -6,6 +6,7 @@ class User(models.Model):
     SOCIAL_CHOICES = [("KAKAO", "Kakao"), ("NAVER", "Naver")]
     GENDER_CHOICES = [("male", "남성"), ("female", "여성")]
 
+    id = models.AutoField(primary_key=True)
     nickname = models.CharField(max_length=30)
     social_type = models.CharField(max_length=10, choices=SOCIAL_CHOICES)
     email = models.CharField(max_length=255)
@@ -21,7 +22,8 @@ class Questionnaire(models.Model):
     STATUS_CHOICES = [("SINGLE", "싱글"), ("DATING", "연애중"), ("MARRIED", "기혼")]
     MARRIAGE_VALUES_CHOICES = [("POSITIVE", "긍정적"), ("NEGATIVE", "부정적"), ("NEUTRAL", "중립적")]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="questionnaires")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, null=True)
     relationship_count = models.IntegerField(null=True)
     marriage_count = models.IntegerField(null=True)

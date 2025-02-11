@@ -1,5 +1,7 @@
 from django.db import models
 
+from config.settings.base import env
+from tarot.util import CompletionExecutor
 from user.models import User
 
 
@@ -12,6 +14,75 @@ class TimeStampedModel(models.Model):
 
 
 class TaroChatRooms(TimeStampedModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class TaroCardContents(TimeStampedModel):
+    room = models.ForeignKey(TaroChatRooms, on_delete=models.CASCADE)
     card_id = models.IntegerField()
     card_content = models.TextField()
-    category = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    @classmethod
+    def generate_tarot_prompt(cls, content: str) -> str:
+        completion_executor = CompletionExecutor(
+            host="https://clovastudio.stream.ntruss.com",
+            api_key=env("CLOVA_API_KEY"),
+            request_id=env("GENERATE_REQUEST_ID"),
+        )
+
+        preset_text = [
+            {
+                "role": "system",
+                "content": env("GENERATE_CONTENTS"),
+            },
+            {"role": "user", "content": f"{content}"},
+        ]
+
+        request_data = {
+            "messages": preset_text,
+            "topP": 0.8,
+            "topK": 0,
+            "maxTokens": 498,
+            "temperature": 0.5,
+            "repeatPenalty": 5.0,
+            "stopBefore": [],
+            "includeAiFilters": True,
+            "seed": 0,
+        }
+
+        chat_response = completion_executor.execute(request_data)
+        return chat_response
+
+
+class TaroChatContents(TimeStampedModel):
+    room = models.ForeignKey(TaroChatRooms, on_delete=models.CASCADE)
+    content = models.TextField()
+
+    @classmethod
+    def init_tarot_prompt(cls, content: str) -> str:
+        completion_executor = CompletionExecutor(
+            host="https://clovastudio.stream.ntruss.com",
+            api_key=env("CLOVA_API_KEY"),
+            request_id=env("INIT_REQUEST_ID"),
+        )
+        preset_text = [
+            {
+                "role": "system",
+                "content": env("INIT_CONTENTS"),
+            },
+            {"role": "user", "content": f"{content}"},
+        ]
+
+        request_data = {
+            "messages": preset_text,
+            "topP": 0.8,
+            "topK": 0,
+            "maxTokens": 256,
+            "temperature": 0.5,
+            "repeatPenalty": 5.0,
+            "stopBefore": [],
+            "includeAiFilters": True,
+            "seed": 0,
+        }
+        chat_response = completion_executor.execute(request_data)
+        return chat_response

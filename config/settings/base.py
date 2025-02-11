@@ -11,16 +11,16 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import environ
+from dotenv import load_dotenv
 
-# 환경 변수 로드
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 # environ.Env.read_env()
 env_path = os.path.join(BASE_DIR, ".env")
@@ -32,8 +32,6 @@ if os.path.exists(env_path):
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
 
@@ -58,7 +56,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg",
     "channels",  # Django Channels 추가
+    "rest_framework_simplejwt",
 ]
+
+# .env 파일 로드
+load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env.dev"))
+
+KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
+KAKAO_REDIRECT_URI = os.getenv("KAKAO_REDIRECT_URI")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -89,17 +94,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
 
 # Password validation
@@ -144,13 +138,16 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
     # "DEFAULT_AUTHENTICATION_CLASSES": [
     #     "rest_framework.authentication.BasicAuthentication",
     #     "rest_framework.authentication.SessionAuthentication",
     # ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
-    ],
 }
 
 
@@ -169,4 +166,11 @@ NCP_STORAGE = {
     "SECRET_KEY": env("NCP_SECRET_KEY"),
     "BUCKET_NAME": "tataro-content",
     "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
