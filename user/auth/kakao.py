@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from config.settings.base import env
 from user.models import User
@@ -87,7 +88,7 @@ class KakaoCallbackView(APIView):
             },
         )
 
-        refresh = RefreshToken.for_user(user)  # type: ignore
+        refresh = RefreshToken.for_user(user)
 
         # 응답 반환
         return Response(
