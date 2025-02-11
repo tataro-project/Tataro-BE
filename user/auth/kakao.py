@@ -1,5 +1,4 @@
 import requests
-from django.conf import settings
 from django.http.response import HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.shortcuts import redirect
 from drf_yasg.utils import swagger_auto_schema
@@ -9,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from config.settings.base import env
 from user.models import User
 
 
@@ -19,8 +19,8 @@ class KakaoLoginView(APIView):
     def get(self, request: Request) -> HttpResponsePermanentRedirect | HttpResponseRedirect:
         kakao_auth_url = (
             f"https://kauth.kakao.com/oauth/authorize?"
-            f"client_id={settings.KAKAO_REST_API_KEY}&"
-            f"redirect_uri={settings.KAKAO_REDIRECT_URI}&"
+            f"client_id={env("KAKAO_REST_API_KEY")}&"
+            f"redirect_uri={env("KAKAO_REDIRECT_URI")}&"
             f"response_type=code"
         )
         return redirect(kakao_auth_url)
@@ -44,8 +44,8 @@ class KakaoCallbackView(APIView):
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {
             "grant_type": "authorization_code",
-            "client_id": settings.KAKAO_REST_API_KEY,
-            "redirect_uri": settings.KAKAO_REDIRECT_URI,
+            "client_id": env("KAKAO_REST_API_KEY"),
+            "redirect_uri": env("KAKAO_REDIRECT_URI"),
             "code": code,
         }
 
