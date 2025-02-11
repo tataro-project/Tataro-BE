@@ -14,6 +14,11 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       NCP_ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
       NCP_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+      KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      NAVER_REDIRECT_URI: ${{ secrets.NAVER_REDIRECT_URI }}
 
     services:
       postgres:
