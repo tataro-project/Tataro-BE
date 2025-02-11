@@ -21,7 +21,6 @@ def upload_to_ncp(cate: str, file):  # type: ignore
         file,
         ncp_config["BUCKET_NAME"],
         file_name,
-        ExtraArgs={"ACL": "public-read"},
     )
 
     return f"{ncp_config['ENDPOINT_URL']}/{ncp_config['BUCKET_NAME']}/{file_name}"
