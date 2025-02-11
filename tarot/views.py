@@ -26,7 +26,7 @@ class TarotInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
         if isinstance(content, str) and chat_content:
             prompt = TaroChatContents.init_tarot_prompt(content)
             print("prompt=", prompt)
-            init_serializer = self.get_serializer(data={"content": prompt}, context={"room_id": chat_content.id})
+            init_serializer = self.get_serializer(data={"content": prompt}, context={"room_id": chat_content.room_id})
             if init_serializer.is_valid(raise_exception=True):
                 init_serializer.save()
             return Response(init_serializer.data, status=status.HTTP_201_CREATED)
