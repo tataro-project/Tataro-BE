@@ -17,7 +17,7 @@ class TaroChatContentsInitSerializer(serializers.ModelSerializer[TaroChatContent
         room_id = self.context.get("room_id")
         # 새로운 TaroChatRooms 객체 생성
         if not room_id:
-            room_id = TaroChatRooms.objects.create(user=self.context["request"].get("user")).id  # 테스트 후 user로 변경
+            room_id = TaroChatRooms.objects.create(user=self.context["request"].user).id  # 테스트 후 user로 변경
 
         # TaroChatContents 객체 생성 및 저장
         chat_content = TaroChatContents.objects.create(room_id=room_id, **validated_data)
