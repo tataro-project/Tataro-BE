@@ -1,15 +1,15 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
 
-class User(models.Model):
+class User(AbstractUser):
     SOCIAL_CHOICES = [("KAKAO", "Kakao"), ("NAVER", "Naver")]
     GENDER_CHOICES = [("male", "남성"), ("female", "여성")]
 
     id = models.AutoField(primary_key=True)
     nickname = models.CharField(max_length=30)
     social_type = models.CharField(max_length=10, choices=SOCIAL_CHOICES)
-    email = models.CharField(max_length=255)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True)
     birth = models.DateTimeField(null=True)
     created_at = models.DateTimeField(default=timezone.now)

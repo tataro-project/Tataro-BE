@@ -15,7 +15,6 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
-from dotenv import load_dotenv
 
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -60,11 +59,6 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
 ]
 
-# .env 파일 로드
-load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env.dev"))
-
-KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
-KAKAO_REDIRECT_URI = os.getenv("KAKAO_REDIRECT_URI")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -125,6 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "user.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -154,6 +149,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",  # 또는 필요한 다른 권한 설정
     ],
     # "DEFAULT_AUTHENTICATION_CLASSES": [
     #     "rest_framework.authentication.BasicAuthentication",
