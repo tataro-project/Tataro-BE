@@ -1,14 +1,12 @@
 import requests
-from django.conf import settings
-from django.http.response import HttpResponsePermanentRedirect, HttpResponseRedirect
-from django.shortcuts import redirect
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
+from config.settings.base import env
 from user.models import User
 
 
@@ -16,15 +14,14 @@ class KakaoLoginView(APIView):
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(operation_description="카카오 로그인 URL 반환", responses={200: "로그인 URL 반환 성공"})
-    def get(self, request: Request) -> HttpResponsePermanentRedirect | HttpResponseRedirect:
+    def get(self, request: Request) -> Response:
         kakao_auth_url = (
             f"https://kauth.kakao.com/oauth/authorize?"
-            f"client_id={settings.KAKAO_REST_API_KEY}&"
-            f"redirect_uri={settings.KAKAO_REDIRECT_URI}&"
+            f"client_id={env("KAKAO_REST_API_KEY")}&"
+            f"redirect_uri={env("KAKAO_REDIRECT_URI")}&"
             f"response_type=code"
         )
-        return redirect(kakao_auth_url)
-        # return Response({"auth_url": kakao_auth_url})
+        return Response({"auth_url": kakao_auth_url}, status=status.HTTP_200_OK)
 
 
 class KakaoCallbackView(APIView):
@@ -44,8 +41,8 @@ class KakaoCallbackView(APIView):
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {
             "grant_type": "authorization_code",
-            "client_id": settings.KAKAO_REST_API_KEY,
-            "redirect_uri": settings.KAKAO_REDIRECT_URI,
+            "client_id": env("KAKAO_REST_API_KEY"),
+            "redirect_uri": env("KAKAO_REDIRECT_URI"),
             "code": code,
         }
 
@@ -70,27 +67,42 @@ class KakaoCallbackView(APIView):
             )
 
         user_info = user_info_response.json()
-        nickname = user_info["properties"]["nickname"]
-        email = user_info["kakao_account"]["email"]
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            user = User(nickname=nickname, social_type="kakao", email=email)
 
-        # JWT 토큰 발급
-        # AbstractBaseUser 상속받게 해야함
-        # AbstractBaseUser 상속받게 해야함
-        # AbstractBaseUser 상속받게 해야함
+        # 사용자 정보 추출
+        kakao_account = user_info.get("kakao_account", {})
+        profile = kakao_account.get("profile", {})
+        nickname = profile.get("nickname")
+        email = kakao_account.get("email")
+        gender = kakao_account.get("gender")  # male 또는 female
+        birth = kakao_account.get("birth")  # MM-DD 형식 (예: 01-01)
+
+        # 데이터베이스에 사용자 저장 또는 업데이트
+        user, created = User.objects.update_or_create(
+            email=email,
+            defaults={
+                "social_type": "KAKAO",
+                "nickname": nickname,
+                "gender": gender,
+                "birth": birth,
+            },
+        )
+
         refresh = RefreshToken.for_user(user)  # type: ignore
 
-        # 사용자 정보 반환 (또는 데이터베이스 처리)
+        # 응답 반환
         return Response(
             {
                 "access_token": str(refresh.access_token),
                 "refresh_token": str(refresh),
+                "message": "User information retrieved successfully",
                 "user_id": user.id,
-                "nickname": user.nickname,
-                "email": user.email,
-                "social_type": user.social_type,
-            }
+                "created": created,
+                "user_data": {
+                    "nickname": user.nickname,
+                    "email": user.email,
+                    "gender": user.gender,
+                    "birth": user.birth,
+                },
+            },
+            status=200,
         )
