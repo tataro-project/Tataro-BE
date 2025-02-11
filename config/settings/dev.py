@@ -16,3 +16,16 @@ DATABASES = {
         "PORT": env("DB_PORT", default="5432"),
     }
 }
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "DEFAULT_API_URL": "http://127.0.0.1:8000/",  # HTTPS URL로 명시
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {  # JWT 인증 방식 정의
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": 'JWT Authorization header using the Bearer scheme. Example: "Authorization: Bearer {token}"',
+        },
+    },
+}
