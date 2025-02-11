@@ -1,26 +1,35 @@
 import requests
 from django.conf import settings
+from django.http.response import HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.shortcuts import redirect
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from user.models import User
 
 
 class KakaoLoginView(APIView):
+    permission_classes = [AllowAny]
+
     @swagger_auto_schema(operation_description="카카오 로그인 URL 반환", responses={200: "로그인 URL 반환 성공"})
-    def get(self, request: Request) -> Response:
+    def get(self, request: Request) -> HttpResponsePermanentRedirect | HttpResponseRedirect:
         kakao_auth_url = (
             f"https://kauth.kakao.com/oauth/authorize?"
             f"client_id={settings.KAKAO_REST_API_KEY}&"
             f"redirect_uri={settings.KAKAO_REDIRECT_URI}&"
             f"response_type=code"
         )
-        return Response({"auth_url": kakao_auth_url})
+        return redirect(kakao_auth_url)
+        # return Response({"auth_url": kakao_auth_url})
 
 
 class KakaoCallbackView(APIView):
+    permission_classes = [AllowAny]
+
     @swagger_auto_schema(
         operation_description="카카오 로그인 콜백 처리",
         responses={200: "사용자 정보 반환", 400: "Authorization code is missing"},
@@ -61,11 +70,27 @@ class KakaoCallbackView(APIView):
             )
 
         user_info = user_info_response.json()
+        nickname = user_info["properties"]["nickname"]
+        email = user_info["kakao_account"]["email"]
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            user = User(nickname=nickname, social_type="kakao", email=email)
+
+        # JWT 토큰 발급
+        # AbstractBaseUser 상속받게 해야함
+        # AbstractBaseUser 상속받게 해야함
+        # AbstractBaseUser 상속받게 해야함
+        refresh = RefreshToken.for_user(user)  # type: ignore
 
         # 사용자 정보 반환 (또는 데이터베이스 처리)
         return Response(
             {
-                "user_id": User.id,
-                "nickname": User.nickname,
+                "access_token": str(refresh.access_token),
+                "refresh_token": str(refresh),
+                "user_id": user.id,
+                "nickname": user.nickname,
+                "email": user.email,
+                "social_type": user.social_type,
             }
         )
