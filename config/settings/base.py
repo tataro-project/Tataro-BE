@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "channels",  # Django Channels 추가
     "corsheaders",
+    "rest_framework_simplejwt",
 ]
 
 # .env 파일 로드
@@ -147,6 +149,12 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
     # "DEFAULT_AUTHENTICATION_CLASSES": [
     #     "rest_framework.authentication.BasicAuthentication",
     #     "rest_framework.authentication.SessionAuthentication",
@@ -172,4 +180,11 @@ NCP_STORAGE = {
     "SECRET_KEY": env("NCP_SECRET_KEY"),
     "BUCKET_NAME": "tataro-content",
     "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
