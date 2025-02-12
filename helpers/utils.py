@@ -21,7 +21,29 @@ def upload_to_ncp(cate: str, file):  # type: ignore
         file,
         ncp_config["BUCKET_NAME"],
         file_name,
-        ExtraArgs={"ACL": "public-read"},
     )
 
     return f"{ncp_config['ENDPOINT_URL']}/{ncp_config['BUCKET_NAME']}/{file_name}"
+
+
+def delete_from_ncp(file_url: str):  # type: ignore
+    """NCP Object Storage에서 파일 삭제"""
+    ncp_config = settings.NCP_STORAGE
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=ncp_config["ACCESS_KEY"],
+        aws_secret_access_key=ncp_config["SECRET_KEY"],
+        endpoint_url=ncp_config["ENDPOINT_URL"],
+    )
+
+    # URL에서 버킷 이름과 파일 경로 추출
+    file_path = file_url.replace(f"{ncp_config['ENDPOINT_URL']}/{ncp_config['BUCKET_NAME']}/", "")
+
+    try:
+        s3_client.delete_object(
+            Bucket=ncp_config["BUCKET_NAME"],
+            Key=file_path,
+        )
+        print(f"파일 삭제 성공: {file_url}")
+    except Exception as e:
+        print(f"파일 삭제 실패: {e}")

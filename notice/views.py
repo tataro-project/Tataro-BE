@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
@@ -8,11 +10,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from helpers.pagination import CustomPageNumberPagination
+from helpers.utils import delete_from_ncp
+from user.models import User
 
 from .models import Notice
 from .serializers import NoticeSerializer
-
-User = get_user_model()
 
 
 @swagger_auto_schema(
@@ -84,7 +86,16 @@ def notice_detail_update_delete(request: Request, notice_id: int) -> Response:  
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == "DELETE":
-        if not isinstance(request.user, User) or not isinstance(notice.user, User) or request.user.id != notice.user.id:
+        if cast(User, request.user) != notice.user:
             return Response({"error": "삭제 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+        # 공지에 이미지 URL이 있는 경우 NCP에서 삭제
+        if notice.img_url:  # 이미지 URL 필드가 있다고 가정
+            try:
+                delete_from_ncp(notice.img_url)
+            except Exception as e:
+                return Response(
+                    {"error": f"이미지 삭제 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        # 공지 삭제
         notice.delete()
-        return Response({"message": "공지사항이 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "공지가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)

@@ -70,6 +70,7 @@ class NaverCallbackView(APIView):
                 "nickname": nickname,
                 "gender": gender,
                 "birth": birth,
+                "is_active": True,
             },
         )
 
