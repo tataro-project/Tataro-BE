@@ -8,7 +8,7 @@ from .models import User
 # User 모델의 데이터를 JSON 형식으로 변환하거나
 # JSON 데이터를 User 모델로 변환하는 시리얼라이저
 class UserUpdateSerializer(serializers.ModelSerializer[User]):
-    birthday = serializers.BooleanField(source="birth")
+    birthday = serializers.DateTimeField(source="birth")
 
     class Meta:
         # User 모델과 매핑
