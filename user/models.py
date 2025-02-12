@@ -4,10 +4,15 @@ from django.utils import timezone
 
 
 class User(AbstractUser):
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []  # email을 여기서 제거
+
     SOCIAL_CHOICES = [("KAKAO", "Kakao"), ("NAVER", "Naver")]
     GENDER_CHOICES = [("male", "남성"), ("female", "여성")]
 
     id = models.AutoField(primary_key=True)
+    username = models.CharField(max_length=20, null=True, blank=True)  # type :ignore
+    email = models.EmailField(unique=True)  # email을 unique로 설정
     nickname = models.CharField(max_length=30)
     social_type = models.CharField(max_length=10, choices=SOCIAL_CHOICES)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True)
