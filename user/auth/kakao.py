@@ -103,7 +103,7 @@ class KakaoCallbackView(APIView):
                     "nickname": user.nickname,
                     "email": user.email,
                     "gender": user.gender,
-                    "birth": user.birth,
+                    "birthday": user.birth,
                 },
             },
             status=200,
