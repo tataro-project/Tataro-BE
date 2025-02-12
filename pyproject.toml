@@ -18,7 +18,12 @@ channels-redis = "^4.2.1"
 django-stubs = "^5.1.2"
 djangorestframework-stubs = "^3.15.2"
 psycopg2 = "^2.9.10"
+<<<<<<< HEAD
 boto3 = "1.35.76"
+=======
+uvicorn = "^0.34.0"
+django-cors-headers = "^4.7.0"
+>>>>>>> develop
 djangorestframework-simplejwt = "^5.4.0"
 python-dotenv = "^1.0.1"
 

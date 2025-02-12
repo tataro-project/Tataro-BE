@@ -32,7 +32,7 @@ if os.path.exists(env_path):
 SECRET_KEY = env("SECRET_KEY")
 
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = ["*"]
 
 
 # Application definition
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg",
     "channels",  # Django Channels 추가
+    "corsheaders",
     "rest_framework_simplejwt",
 ]
 
@@ -67,7 +68,17 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # 추가
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://hakunamatatarot.com",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "config.urls"
 
@@ -138,7 +149,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-        "rest_framework.permissions.AllowAny",  # 또는 필요한 다른 권한 설정
+        # "rest_framework.permissions.AllowAny",  # 또는 필요한 다른 권한 설정
     ],
     # "DEFAULT_AUTHENTICATION_CLASSES": [
     #     "rest_framework.authentication.BasicAuthentication",
