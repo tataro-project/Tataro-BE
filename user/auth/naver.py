@@ -59,7 +59,8 @@ class NaverCallbackView(APIView):
         user_info = profile_data["response"]
         email = user_info.get("email")
         nickname = user_info.get("nickname")
-        gender = user_info.get("gender")
+        gender_map = {"M": "male", "F": "female"}
+        gender = gender_map.get(user_info.get("gender"), None)  # 변환 실패 시 None
         birth = user_info.get("birth")
 
         # 데이터베이스에 사용자 저장 또는 업데이트
