@@ -26,7 +26,7 @@ class UserUpdateSerializer(serializers.ModelSerializer[User]):
         # get 메서드를 사용하여 새로운 값이 있으면 업데이트, 없으면 기존 값 유지
         instance.nickname = validated_data.get("nickname", instance.nickname)
         instance.gender = validated_data.get("gender", instance.gender)
-        instance.birth = validated_data.get("birth", instance.birth)
+        instance.birth = validated_data.get("birthday", instance.birth)
 
         # 변경된 데이터를 데이터베이스에 저장
         instance.save()
