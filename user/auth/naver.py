@@ -55,29 +55,29 @@ class NaverCallbackView(APIView):
         if profile_data.get("message") != "success":
             return Response({"error": "Failed to retrieve user profile"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 사용자 정보 반환
+        # 사용자 정보 추출
         user_info = profile_data["response"]
         email = user_info.get("email")
-        nickname = user_info.get("nickname")
-        gender_map = {"M": "male", "F": "female"}
-        gender = gender_map.get(user_info.get("gender"), None)  # 변환 실패 시 None
-        birth = user_info.get("birth")
 
-        # 먼저 사용자를 조회합니다.
+        # 기존 사용자 조회
         existing_user = User.objects.filter(email=email).first()
 
-        # 데이터베이스에 사용자 저장 또는 업데이트
-        user, created = User.objects.update_or_create(
-            email=email,
-            defaults={
-                "social_type": "KAKAO",
-                # nickname, gender, birth는 사용자가 직접 수정한 경우 덮어쓰지 않음
-                "nickname": nickname or (existing_user.nickname if existing_user else ""),
-                "gender": gender or (existing_user.gender if existing_user else ""),
-                "birth": birth or (existing_user.birth if existing_user else None),
-                "is_active": True,
-            },
-        )
+        if existing_user:
+            # 기존 사용자의 경우, 네이버 정보로 업데이트하지 않음
+            user = existing_user
+            created = False
+        else:
+            # 새로운 사용자 생성
+            gender_map = {"M": "male", "F": "female"}
+            user = User.objects.create(
+                email=email,
+                nickname=user_info.get("nickname", ""),
+                gender=gender_map.get(user_info.get("gender"), None),
+                birth=user_info.get("birth", None),
+                social_type="NAVER",
+                is_active=True,
+            )
+            created = True
 
         refresh = RefreshToken.for_user(user)
 

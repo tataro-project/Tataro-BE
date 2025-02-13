@@ -80,19 +80,6 @@ class KakaoCallbackView(APIView):
         # 먼저 사용자를 조회합니다.
         existing_user = User.objects.filter(email=email).first()
 
-        # # 데이터베이스에 사용자 저장 또는 업데이트
-        # user, created = User.objects.update_or_create(
-        #     email=email,
-        #     defaults={
-        #         "social_type": "KAKAO",
-        #         # nickname, gender, birth는 사용자가 직접 수정한 경우 덮어쓰지 않음
-        #         "nickname": nickname or (existing_user.nickname if existing_user else ""),
-        #         "gender": gender or (existing_user.gender if existing_user else ""),
-        #         "birth": birth or (existing_user.birth if existing_user else None),
-        #         "is_active": True,
-        #     },
-        # )
-
         if existing_user:
             # 기존 사용자의 경우, 카카오 정보로 업데이트하지 않음
             user = existing_user
@@ -123,8 +110,8 @@ class KakaoCallbackView(APIView):
                     "nickname": user.nickname,
                     "email": user.email,
                     "gender": user.gender,
-                    "birth": user.birth,
+                    "birthday": user.birth,
                 },
             },
-            status=200,
+            status=status.HTTP_200_OK,
         )
