@@ -89,7 +89,7 @@ class NaverCallbackView(APIView):
                     "email": user.email,
                     "nickname": user.nickname,
                     "gender": user.gender,
-                    "birth": user.birth,
+                    "birthday": user.birth,
                 },
             },
             status=status.HTTP_200_OK,
