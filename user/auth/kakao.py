@@ -72,26 +72,42 @@ class KakaoCallbackView(APIView):
         # 사용자 정보 추출
         kakao_account = user_info.get("kakao_account", {})
         profile = kakao_account.get("profile", {})
-        nickname = profile.get("nickname")
         email = kakao_account.get("email")
-        gender = kakao_account.get("gender")  # male 또는 female
-        birth = kakao_account.get("birth")  # MM-DD 형식 (예: 01-01)
+        # nickname = profile.get("nickname")
+        # gender = kakao_account.get("gender")  # male 또는 female
+        # birth = kakao_account.get("birth")  # MM-DD 형식 (예: 01-01)
 
         # 먼저 사용자를 조회합니다.
         existing_user = User.objects.filter(email=email).first()
 
-        # 데이터베이스에 사용자 저장 또는 업데이트
-        user, created = User.objects.update_or_create(
-            email=email,
-            defaults={
-                "social_type": "KAKAO",
-                # nickname, gender, birth는 사용자가 직접 수정한 경우 덮어쓰지 않음
-                "nickname": nickname or (existing_user.nickname if existing_user else ""),
-                "gender": gender or (existing_user.gender if existing_user else ""),
-                "birth": birth or (existing_user.birth if existing_user else None),
-                "is_active": True,
-            },
-        )
+        # # 데이터베이스에 사용자 저장 또는 업데이트
+        # user, created = User.objects.update_or_create(
+        #     email=email,
+        #     defaults={
+        #         "social_type": "KAKAO",
+        #         # nickname, gender, birth는 사용자가 직접 수정한 경우 덮어쓰지 않음
+        #         "nickname": nickname or (existing_user.nickname if existing_user else ""),
+        #         "gender": gender or (existing_user.gender if existing_user else ""),
+        #         "birth": birth or (existing_user.birth if existing_user else None),
+        #         "is_active": True,
+        #     },
+        # )
+
+        if existing_user:
+            # 기존 사용자의 경우, 카카오 정보로 업데이트하지 않음
+            user = existing_user
+            created = False
+        else:
+            # 새로운 사용자 생성
+            user = User.objects.create(
+                email=email,
+                nickname=profile.get("nickname", ""),
+                gender=kakao_account.get("gender", ""),
+                birth=kakao_account.get("birth", None),
+                social_type="KAKAO",
+                is_active=True,
+            )
+            created = True
 
         refresh = RefreshToken.for_user(user)
 
