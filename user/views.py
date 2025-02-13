@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -13,6 +14,11 @@ class UserView(APIView):
     # 인증된 사용자만 접근 가능하도록 설정
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_summary="유저 정보를 응답합니다.",
+        operation_description='"id", "nickname", "email", "gender", "birthday", "social_type" 를 응답합니다',
+        responses={201: UserUpdateSerializer, 400: "잘못된 요청"},
+    )
     # 사용자 정보 조회를 처리하는 GET 메서드
     def get(self, request: Request) -> Response:
         try:
@@ -27,6 +33,12 @@ class UserView(APIView):
         except User.DoesNotExist:
             return Response({"message": "User Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
+    @swagger_auto_schema(
+        operation_summary="유저 정보 수정",
+        operation_description='유저의 "nickname", "gender", "birthday"를 수정합니다.',
+        request_body=UserUpdateSerializer,
+        responses={201: UserUpdateSerializer, 400: "잘못된 요청"},
+    )
     # 사용자 정보 수정을 처리하는 PUT 메서드
     def put(self, request: Request) -> Response:
         try:
