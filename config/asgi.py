@@ -19,7 +19,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{environment}"
 
 django.setup()
 
-from notification.urls import websocket_urlpatterns
+from notification.routing import websocket_urlpatterns
 
 # ASGI 애플리케이션 (웹소켓)
 application = ProtocolTypeRouter(

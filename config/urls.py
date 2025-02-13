@@ -44,7 +44,8 @@ urlpatterns = [
     path("api/v1/review/", include("review.urls")),
     path("api/v1/notice/", include("notice.urls")),
     path("api/v1/faq/", include("faq.urls")),
-    path("ws/notifications/", NotificationConsumer.as_asgi()),
+    path("api/v1/notification/", include("notification.urls")),
+    path("api/v1/notification/", include("notification.urls")),
     path("api/v1/tarot/", include("tarot.urls")),
     path("api/v1/", include("user.urls")),
 ]

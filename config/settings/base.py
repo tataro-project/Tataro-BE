@@ -38,6 +38,7 @@ ALLOWED_HOSTS: list[str] = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # django asgi 서버
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
 ]
 
+ASGI_APPLICATION = "config.asgi.application"  # daphne 서버 사용하도록 설정
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -147,7 +149,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-
     # "DEFAULT_AUTHENTICATION_CLASSES": [
     #     "rest_framework.authentication.BasicAuthentication",
     #     "rest_framework.authentication.SessionAuthentication",
