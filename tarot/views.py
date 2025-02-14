@@ -2,6 +2,7 @@ import re
 from typing import Any
 
 from django.db.models import Prefetch
+from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -25,11 +26,44 @@ class TarotInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
 
     # 정규식 패턴을 사용하여 하나의 URL 패턴을 사용하여 room_id가 있는경우와 없는경우를 나눠 응답할수있음
     @swagger_auto_schema(
-        operation_summary="타로 AI 답변 응답",
-        operation_description="타로 AI가 사용자의 질문과 뽑은 카드에 대한 답변을 생성하여 응답합니다",
+        operation_summary="타로 AI 카드 뽑기 멘트 응답",
+        operation_description="사용자 질문에 대하여 타로 AI가 카드 뽑기 멘트를 응답합니다.",
     )
-    @action(detail=False, methods=["post"], url_path="init/(?P<room_id>\d+)?")  # type:ignore
-    def init(self, request: Request, room_id: None | int = None) -> Response:
+    def init_create(self, request: Request, room_id: int, *args: list[Any], **kwargs: dict[str, Any]) -> Response:
+        chat_content = None
+        serializer = None
+
+        # room_id가 있으면 tarochatroom 객체 생성 안해도됨
+        if room_id:
+            serializer = self.get_serializer(data=request.data, context={"room_id": room_id})
+        else:
+            serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            chat_content = serializer.save()
+        content = request.data.get("content")
+        if isinstance(content, str) and chat_content:
+            prompt = TaroChatContents.init_tarot_prompt(content)
+            print("prompt=", prompt)
+            init_serializer = self.get_serializer(
+                data={"content": prompt}, context={"room_id": chat_content.room_id, "chat_id": chat_content.id}
+            )
+            if init_serializer.is_valid(raise_exception=True):
+                init_serializer.save()
+            return Response(init_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            raise ValidationError({"content": content})
+
+
+class TarotAfterInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
+
+    serializer_class = TaroChatContentsInitSerializer
+
+    # 정규식 패턴을 사용하여 하나의 URL 패턴을 사용하여 room_id가 있는경우와 없는경우를 나눠 응답할수있음
+    @swagger_auto_schema(
+        operation_summary="(두번째 질문부터) 타로 AI 카드 뽑기 멘트 응답",
+        operation_description="사용자 질문에 대하여 타로 AI가 카드 뽑기 멘트를 응답합니다.",
+    )
+    def after_create(self, request: Request, room_id: int, *args: list[Any], **kwargs: dict[str, Any]) -> Response:
         chat_content = None
         serializer = None
 
@@ -61,12 +95,12 @@ class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
     ).all()  # path parameter default pk임
     serializer_class = TaroChatRoomResponseSerializer
 
-    @swagger_auto_schema(
-        operation_summary="타로 AI 답변 응답",
+    @swagger_auto_schema(  # type:ignore
+        operation_summary="질문에 대한 타로 AI 답변 응답",
         operation_description="타로 AI가 사용자의 질문과 뽑은 카드에 대한 답변을 생성하여 응답합니다",
         request_body=no_body,
         responses={201: TaroChatRoomResponseSerializer},
-    )  # type:ignore
+    )
     def create(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
         chat_room = self.get_object()
         question = chat_room.contents_list[0].content
@@ -80,8 +114,8 @@ class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
         # 카드 이름 파싱
         first = prompt.index("🔮")
         second = prompt.index("🔮", first + 1)
-        card_name = re.findall(r"[a-zA-Z]+", prompt[first:second])
-        card_name = " ".join(card_name)
+        eng_list = re.findall(r"[a-zA-Z]+", prompt[first:second])
+        card_name = " ".join(eng_list)
 
         # 카드 방향 파싱
         card_direction = prompt[second - 3 : second]
