@@ -38,6 +38,7 @@ ALLOWED_HOSTS: list[str] = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # django asgi 서버
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     "faq.apps.FaqConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
+    "helpers.apps.HelpersConfig",
     # third_apps
     "rest_framework",
     "drf_yasg",
@@ -59,6 +61,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
 ]
 
+ASGI_APPLICATION = "config.asgi.application"  # daphne 서버 사용하도록 설정
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -76,9 +79,15 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://hakunamatatarot.com",
+    "http://localhost:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "x-requested-with",
+]
 
 ROOT_URLCONF = "config.urls"
 
@@ -149,14 +158,9 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-        # "rest_framework.permissions.AllowAny",  # 또는 필요한 다른 권한 설정
+        # "rest_framework.permissions.AllowAny",
     ],
-    # "DEFAULT_AUTHENTICATION_CLASSES": [
-    #     "rest_framework.authentication.BasicAuthentication",
-    #     "rest_framework.authentication.SessionAuthentication",
-    # ],
 }
-
 
 CHANNEL_LAYERS = {
     "default": {

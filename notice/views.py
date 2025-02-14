@@ -3,18 +3,24 @@ from typing import cast
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from helpers.models import Category
 from helpers.pagination import CustomPageNumberPagination
 from helpers.utils import delete_from_ncp
 from user.models import User
 
 from .models import Notice
-from .serializers import NoticeSerializer
+from .serializers import CategorySerializer, NoticeSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):  # type: ignore
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 @swagger_auto_schema(
@@ -37,8 +43,8 @@ def notice_list_or_create(request: Request) -> Response:  # type: ignore
     if request.method == "GET":  # 공지사항 목록 조회
         notices = Notice.objects.all().order_by("-order", "-created_at")  # order 순 정렬, 최신순
         paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
-        paginated_faqs = paginator.paginate_queryset(notices, request)  # 페이지네이션 적용
-        serializer = NoticeSerializer(paginated_faqs, many=True)
+        paginated_notices = paginator.paginate_queryset(notices, request)  # 페이지네이션 적용
+        serializer = NoticeSerializer(paginated_notices, many=True)
         return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
 
     elif request.method == "POST":  # 공지사항 생성
@@ -47,6 +53,21 @@ def notice_list_or_create(request: Request) -> Response:  # type: ignore
             serializer.save(user=request.user)  # 작성자 저장
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_summary="카테고리 목록 조회",
+    operation_description="모든 카테고리 목록을 조회합니다.",
+    responses={200: CategorySerializer(many=True)},
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def category_list(request: Request) -> Response:
+    """카테고리 목록 조회"""
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
 
 
 @swagger_auto_schema(
