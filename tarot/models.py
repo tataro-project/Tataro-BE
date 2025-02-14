@@ -18,8 +18,10 @@ class TaroChatRooms(TimeStampedModel):
 
 
 class TaroCardContents(TimeStampedModel):
+    direction = (("upright", "upright"), ("reversed", "reversed"))
     room = models.ForeignKey(TaroChatRooms, on_delete=models.CASCADE)
-    card_id = models.IntegerField()
+    card_name = models.CharField()
+    card_direction = models.CharField(choices=direction)
     card_content = models.TextField()
 
     @classmethod
@@ -40,11 +42,11 @@ class TaroCardContents(TimeStampedModel):
 
         request_data = {
             "messages": preset_text,
-            "topP": 0.8,
-            "topK": 0,
-            "maxTokens": 498,
-            "temperature": 0.5,
-            "repeatPenalty": 5.0,
+            "topP": 0.92,
+            "topK": 40,
+            "maxTokens": 800,
+            "temperature": 0.7,
+            "repeatPenalty": 1.1,
             "stopBefore": [],
             "includeAiFilters": True,
             "seed": 0,
@@ -75,11 +77,11 @@ class TaroChatContents(TimeStampedModel):
 
         request_data = {
             "messages": preset_text,
-            "topP": 0.8,
-            "topK": 0,
-            "maxTokens": 256,
-            "temperature": 0.5,
-            "repeatPenalty": 5.0,
+            "topP": 0.92,
+            "topK": 40,
+            "maxTokens": 800,
+            "temperature": 0.7,
+            "repeatPenalty": 1.1,
             "stopBefore": [],
             "includeAiFilters": True,
             "seed": 0,

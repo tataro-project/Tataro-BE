@@ -20,7 +20,7 @@ class CompletionExecutor:
         }
         chat_response = ""
         with requests.post(
-            self._host + "/testapp/v1/chat-completions/HCX-DASH-001",
+            self._host + "/testapp/v1/chat-completions/HCX-003",
             headers=headers,
             json=completion_request,
             stream=True,
