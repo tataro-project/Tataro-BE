@@ -105,7 +105,9 @@ class NaverCallbackView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
 logger = logging.getLogger(__name__)
+
 
 class NaverReissueView(APIView):
     permission_classes = [AllowAny]
@@ -134,7 +136,6 @@ class NaverReissueView(APIView):
             400: "잘못된 요청",
         },
     )
-
     def post(self, request: Request) -> Response:
         # 클라이언트로부터 refresh 토큰을 받아옴
         refresh_token = request.data.get("refresh_token")
@@ -161,14 +162,11 @@ class NaverReissueView(APIView):
             error_message = response_data.get("error_description", "Unknown error")
             return Response(
                 {"error": response_data["error"], "error_description": error_message},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if "access_token" in response_data:
             return Response(response_data, status=status.HTTP_200_OK)
 
         logger.error(f"Unexpected response. Status: {response.status_code}, Response: {response.text}")
-        return Response(
-            {"error": "Unexpected response from Naver API"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": "Unexpected response from Naver API"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

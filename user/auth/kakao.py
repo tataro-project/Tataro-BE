@@ -63,7 +63,6 @@ class KakaoCallbackView(APIView):
         access_token = token_data.get("access_token")
         refresh_token = token_data.get("refresh_token")
 
-
         # 사용자 정보 요청
         user_info_url = "https://kapi.kakao.com/v2/user/me"
         headers = {"Authorization": f"Bearer {access_token}"}
@@ -169,7 +168,7 @@ class KakaoReissueView(APIView):
             "grant_type": "refresh_token",
             "client_id": env("KAKAO_REST_API_KEY"),
             "refresh_token": refresh_token,
-            "client_secret": env("KAKAO_CLIENT_SECRET")
+            "client_secret": env("KAKAO_CLIENT_SECRET"),
         }
 
         # 헤더 설정
