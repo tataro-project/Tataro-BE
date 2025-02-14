@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "faq.apps.FaqConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
+    "helpers.apps.HelpersConfig",
     # third_apps
     "rest_framework",
     "drf_yasg",
@@ -78,9 +79,15 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://hakunamatatarot.com",
+    "http://localhost:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "x-requested-with",
+]
 
 ROOT_URLCONF = "config.urls"
 
@@ -179,3 +186,4 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+

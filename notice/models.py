@@ -1,19 +1,7 @@
 from django.db import models
 
-from helpers.models import BaseModel
+from helpers.models import BaseModel, Category
 from user.models import User
-
-
-class Category(BaseModel):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):  # type: ignore
-        return self.name
-
-    class Meta:
-        verbose_name_plural = "Categories"
-
 
 class Notice(BaseModel):
     title = models.CharField(max_length=255)
