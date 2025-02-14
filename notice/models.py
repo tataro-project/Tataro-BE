@@ -3,6 +3,7 @@ from django.db import models
 from helpers.models import BaseModel, Category
 from user.models import User
 
+
 class Notice(BaseModel):
     title = models.CharField(max_length=255)
     content = models.TextField()

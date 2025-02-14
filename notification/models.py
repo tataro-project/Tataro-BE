@@ -4,6 +4,7 @@ from django.db import models
 from helpers.models import BaseModel, Category
 from user.models import User
 
+
 class Notification(BaseModel):
     title = models.CharField(max_length=255)
     content = models.TextField()  # content 를 title에 연결할 link 주소로 사용함.
@@ -12,6 +13,7 @@ class Notification(BaseModel):
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="notifications"
     )
+
 
 class NotiUser(BaseModel):
     notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name="notiusers")

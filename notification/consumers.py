@@ -10,6 +10,7 @@ from notification.models import Notification, NotiUser
 
 User = get_user_model()
 
+
 class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
     async def connect(self):  # type: ignore
         """WebSocket 연결 시 실행"""
@@ -36,24 +37,14 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
 
         except json.JSONDecodeError as e:
             print("JSON decode error:", str(e))
-            await self.send(text_data=json.dumps({
-                "error": "Invalid JSON format",
-                "details": str(e)
-            }))
+            await self.send(text_data=json.dumps({"error": "Invalid JSON format", "details": str(e)}))
         except KeyError as e:
             print("Key error:", str(e))
-            await self.send(text_data=json.dumps({
-                "error": "Missing required field",
-                "details": str(e)
-            }))
+            await self.send(text_data=json.dumps({"error": "Missing required field", "details": str(e)}))
         except Exception as e:
             print("Unexpected error:", str(e))
-            await self.send(text_data=json.dumps({
-                "error": "An unexpected error occurred",
-                "details": str(e)
-            }))
+            await self.send(text_data=json.dumps({"error": "An unexpected error occurred", "details": str(e)}))
             # 심각한 오류 발생 시 연결 종료
-
 
     async def send_unread_notifications(self):  # type: ignore
         """읽지 않은 알림 목록을 전송"""
@@ -74,7 +65,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
             for noti in unread_notifications
         ]
 
-        await self.send(text_data=json.dumps({"notifications": notifications_data}, ensure_ascii=False)) # 여기서 ensure_ascii=False 설정을 안하면 인코딩 문제 발생 했음.
+        await self.send(
+            text_data=json.dumps({"notifications": notifications_data}, ensure_ascii=False)
+        )  # 여기서 ensure_ascii=False 설정을 안하면 인코딩 문제 발생 했음.
 
     async def mark_notification_as_read(self, notification_id):  # type: ignore
         """특정 알림을 읽음 처리"""
@@ -84,21 +77,19 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
                 if self.user.id not in notiuser.read_users:
                     notiuser.read_users.append(self.user.id)
                     await sync_to_async(notiuser.save)()
-                    await self.send(text_data=json.dumps({
-                        "status": "marked_as_read",
-                        "notification_id": notification_id
-                    }))
+                    await self.send(
+                        text_data=json.dumps({"status": "marked_as_read", "notification_id": notification_id})
+                    )
                 else:
-                    await self.send(text_data=json.dumps({
-                        "status": "already_read",
-                        "notification_id": notification_id
-                    }))
+                    await self.send(
+                        text_data=json.dumps({"status": "already_read", "notification_id": notification_id})
+                    )
         except NotiUser.DoesNotExist:
             await self.send(text_data=json.dumps({"error": "NotiUser not found"}))
 
-    def get_unread_notifications(self, user):
-        return list(Notification.objects.filter(
-            is_active=True
-        ).exclude(
-            notiusers__read_users__contains=[user.id]
-        ).select_related("category"))
+    def get_unread_notifications(self, user):  # type: ignore
+        return list(
+            Notification.objects.filter(is_active=True)
+            .exclude(notiusers__read_users__contains=[user.id])
+            .select_related("category")
+        )

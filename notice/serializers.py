@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from .models import Category, Notice
+from helpers.models import Category
+
+from .models import Notice
 
 
 class CategorySerializer(serializers.ModelSerializer):  # type: ignore

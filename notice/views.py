@@ -9,11 +9,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from helpers.models import Category
 from helpers.pagination import CustomPageNumberPagination
 from helpers.utils import delete_from_ncp
 from user.models import User
 
-from .models import Category, Notice
+from .models import Notice
 from .serializers import CategorySerializer, NoticeSerializer
 
 

@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import Category, Notice
+from helpers.models import Category
+
+from .models import Notice
 
 
 @admin.register(Category)
