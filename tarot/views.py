@@ -29,15 +29,12 @@ class TarotInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
         operation_summary="타로 AI 카드 뽑기 멘트 응답",
         operation_description="사용자 질문에 대하여 타로 AI가 카드 뽑기 멘트를 응답합니다.",
     )
-    def init_create(self, request: Request, room_id: int, *args: list[Any], **kwargs: dict[str, Any]) -> Response:
+    def init_create(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response:
         chat_content = None
         serializer = None
 
-        # room_id가 있으면 tarochatroom 객체 생성 안해도됨
-        if room_id:
-            serializer = self.get_serializer(data=request.data, context={"room_id": room_id})
-        else:
-            serializer = self.get_serializer(data=request.data)
+        # room_id가 없으면 tarochatroom 객체 생성
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             chat_content = serializer.save()
         content = request.data.get("content")
@@ -58,7 +55,6 @@ class TarotAfterInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
 
     serializer_class = TaroChatContentsInitSerializer
 
-    # 정규식 패턴을 사용하여 하나의 URL 패턴을 사용하여 room_id가 있는경우와 없는경우를 나눠 응답할수있음
     @swagger_auto_schema(
         operation_summary="(두번째 질문부터) 타로 AI 카드 뽑기 멘트 응답",
         operation_description="사용자 질문에 대하여 타로 AI가 카드 뽑기 멘트를 응답합니다.",
@@ -68,10 +64,7 @@ class TarotAfterInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
         serializer = None
 
         # room_id가 있으면 tarochatroom 객체 생성 안해도됨
-        if room_id:
-            serializer = self.get_serializer(data=request.data, context={"room_id": room_id})
-        else:
-            serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={"room_id": room_id})
         if serializer.is_valid(raise_exception=True):
             chat_content = serializer.save()
         content = request.data.get("content")
@@ -103,39 +96,148 @@ class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
     )
     def create(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
         chat_room = self.get_object()
-        question = chat_room.contents_list[0].content
-        answer = chat_room.contents_list[1].content
+        contents_list = chat_room.contents_list
+        chat_log_list = []
+        card_list = TaroCardContents.objects.filter(room_id=chat_room.id).order_by("created_at")
+        # question,answer 쌍으로 데이터가 필요함으로 idx 2씩 증가
+        for idx in range(0, len(contents_list) - 1, 2):
+            question = contents_list[idx].content
+            answer = contents_list[idx + 1].content
+            # 제일 마지막 q&a 쌍이면 타로 ai 응답 생성
+            if idx == len(contents_list) - 2:
+                # 쿼리에서 id를 뽑아서 먼저 객체를 불러온뒤 질문을 얻어냄
+                prompt = TaroCardContents.generate_tarot_prompt(question)
+                print("질문:", question)
+                print("prompt=", prompt)
 
-        # 쿼리에서 id를 뽑아서 먼저 객체를 불러온뒤 질문을 얻어냄
-        prompt = TaroCardContents.generate_tarot_prompt(question)
-        print("질문:", question)
-        print("prompt=", prompt)
+                # 카드 이름 파싱
+                first = prompt.index("🔮")
+                second = prompt.index("🔮", first + 1)
+                eng_list = re.findall(r"[a-zA-Z]+", prompt[first:second])
+                card_name = " ".join(eng_list)
 
-        # 카드 이름 파싱
-        first = prompt.index("🔮")
-        second = prompt.index("🔮", first + 1)
-        eng_list = re.findall(r"[a-zA-Z]+", prompt[first:second])
-        card_name = " ".join(eng_list)
+                # 카드 방향 파싱
+                card_direction = prompt[second - 3 : second]
 
-        # 카드 방향 파싱
-        card_direction = prompt[second - 3 : second]
+                # TaroCardContents 저장
+                TaroCardContents(
+                    room=chat_room, card_name=card_name, card_content=prompt, card_direction=card_direction
+                ).save()
 
-        # TaroCardContents 저장
-        TaroCardContents(room=chat_room, card_name=card_name, card_content=prompt, card_direction=card_direction).save()
+                # 클로바에 전송후 답변을 가져와서 시리얼라이저에담고 저장 후
+                card_url = tarot_cards[card_name]
+                chat_log = TaroChatLogSerializer(
+                    data={
+                        "question": question,
+                        "content": answer,
+                        "card_name": card_name,
+                        "card_url": card_url,
+                        "card_content": prompt,
+                        "card_direction": card_direction,
+                    }
+                )
+                if chat_log.is_valid(raise_exception=True):
+                    chat_log_list.append(chat_log.data)
+            else:
+                # 이미 생성된 타로 응답 데이터가 있을때
+                card = card_list[idx // 2]
+                chat_log = TaroChatLogSerializer(
+                    data={
+                        "question": question,
+                        "content": answer,
+                        "card_name": card.card_name,
+                        "card_url": tarot_cards[card.card_name],
+                        "card_content": card.card_content,
+                        "card_direction": card.card_direction,
+                    }
+                )
+                if chat_log.is_valid(raise_exception=True):
+                    chat_log_list.append(chat_log.data)
 
-        # 클로바에 전송후 답변을 가져와서 시리얼라이저에담고 저장 후
-        card_url = tarot_cards[card_name]
-        chat_log = TaroChatLogSerializer(
-            data={
-                "question": question,
-                "content": answer,
-                "card_name": card_name,
-                "card_url": card_url,
-                "card_content": prompt,
-                "card_direction": card_direction,
-            }
+        serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+        if serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
+    # 필요한 참조 테이블 미리 가져오기
+    queryset = TaroChatRooms.objects.prefetch_related(
+        Prefetch("tarochatcontents_set", to_attr="contents_list")
+    ).all()  # path parameter default pk임
+    serializer_class = TaroChatRoomResponseSerializer
+
+    @swagger_auto_schema(  # type:ignore
+        operation_summary="가장 최신 채팅 로그",
+        operation_description="제일 최근에 했던 채팅을 불러옵니다.",
+        request_body=no_body,
+        responses={201: TaroChatRoomResponseSerializer},
+    )
+    def get_newest_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
+        chat_room = self.get_queryset().order_by("-created_at").first()
+        if not chat_room:
+            raise ValidationError("채팅방을 찾을 수 없습니다")
+        contents_list = chat_room.contents_list
+        chat_log_list = []
+        card_list = TaroCardContents.objects.filter(room_id=chat_room.id).order_by("created_at")
+        # question,answer 쌍으로 데이터가 필요함으로 idx 2씩 증가
+        for idx in range(0, len(contents_list) - 1, 2):
+            question = contents_list[idx].content
+            answer = contents_list[idx + 1].content
+            # 나중에 함수화 시키기
+            card = card_list[idx // 2]
+            chat_log = TaroChatLogSerializer(
+                data={
+                    "question": question,
+                    "content": answer,
+                    "card_name": card.card_name,
+                    "card_url": tarot_cards[card.card_name],
+                    "card_content": card.card_content,
+                    "card_direction": card.card_direction,
+                }
+            )
+            if chat_log.is_valid(raise_exception=True):
+                chat_log_list.append(chat_log.data)
+
+        serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+        if serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(  # type:ignore
+        operation_summary="바로 전 채팅 로그",
+        operation_description="주어진 room_id로 부터 바로 전에 했던 채팅을 불러옵니다.",
+        request_body=no_body,
+        responses={201: TaroChatRoomResponseSerializer},
+    )
+    def get_before_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
+        current_chat_room = self.get_object()
+        # created_at으로 비교하여 바로 전 채팅 로그 찾기
+        chat_room = (
+            self.get_queryset().filter(created_at__lt=current_chat_room.created_at).order_by("-created_at").first()
         )
-        if chat_log.is_valid(raise_exception=True):
-            serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": [chat_log.data]})
-            if serializer.is_valid(raise_exception=True):
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if not chat_room:
+            raise ValidationError("채팅방을 찾을 수 없습니다")
+        contents_list = chat_room.contents_list
+        chat_log_list = []
+        card_list = TaroCardContents.objects.filter(room_id=chat_room.id).order_by("created_at")
+        # question,answer 쌍으로 데이터가 필요함으로 idx 2씩 증가
+        for idx in range(0, len(contents_list) - 1, 2):
+            question = contents_list[idx].content
+            answer = contents_list[idx + 1].content
+            # 나중에 함수화 시키기
+            card = card_list[idx // 2]
+            chat_log = TaroChatLogSerializer(
+                data={
+                    "question": question,
+                    "content": answer,
+                    "card_name": card.card_name,
+                    "card_url": tarot_cards[card.card_name],
+                    "card_content": card.card_content,
+                    "card_direction": card.card_direction,
+                }
+            )
+            if chat_log.is_valid(raise_exception=True):
+                chat_log_list.append(chat_log.data)
+
+        serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+        if serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, status=status.HTTP_201_CREATED)

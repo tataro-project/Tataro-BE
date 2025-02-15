@@ -13,13 +13,12 @@ import django
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 
-from helpers.custom_middleware import TokenAuthMiddleware
-
 environment = os.getenv("DJANGO_ENV", "dev")  # 기본값은 dev
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{environment}")
 
 django.setup()
 
+from helpers.custom_middleware import TokenAuthMiddleware
 from notification.routing import websocket_urlpatterns
 
 # ASGI 애플리케이션 (웹소켓)
