@@ -1,18 +1,21 @@
 import re
 from typing import Any
 
+from django.core.cache import cache
 from django.db.models import Prefetch
 from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from tarot.constants import tarot_cards
 from tarot.models import TaroCardContents, TaroChatContents, TaroChatRooms
 from tarot.serializers import (
+    TaroChatAllRoomResponseSerializer,
     TaroChatContentsInitSerializer,
     TaroChatLogSerializer,
     TaroChatRoomResponseSerializer,
@@ -170,7 +173,7 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
         operation_summary="가장 최신 채팅 로그",
         operation_description="제일 최근에 했던 채팅을 불러옵니다.",
         request_body=no_body,
-        responses={201: TaroChatRoomResponseSerializer},
+        responses={200: TaroChatRoomResponseSerializer},
     )
     def get_newest_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
         chat_room = self.get_queryset().order_by("-created_at").first()
@@ -200,13 +203,13 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
 
         serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
         if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(  # type:ignore
         operation_summary="바로 전 채팅 로그",
         operation_description="주어진 room_id로 부터 바로 전에 했던 채팅을 불러옵니다.",
         request_body=no_body,
-        responses={201: TaroChatRoomResponseSerializer},
+        responses={200: TaroChatRoomResponseSerializer},
     )
     def get_before_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
         current_chat_room = self.get_object()
@@ -240,4 +243,79 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
 
         serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
         if serializer.is_valid(raise_exception=True):
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(  # type:ignore
+        operation_summary="모든 채팅 로그 페이지네이션",
+        operation_description="모든 채팅 로그를 페이지네이션을 통해 해당 페이지의 로그 내역을 응답합니다.",
+        manual_parameters=[
+            openapi.Parameter(
+                "page", openapi.IN_QUERY, description="페이지 번호", type=openapi.TYPE_INTEGER, required=True
+            ),
+            openapi.Parameter(
+                "size", openapi.IN_QUERY, description="페이지 당 게시글 개수", type=openapi.TYPE_INTEGER, required=True
+            ),
+        ],
+        request_body=no_body,
+        responses={200: TaroChatAllRoomResponseSerializer},
+    )
+    # PageNumberPagination의 기능을 거의 안쓸거같아서 사용하지않고 직접 페이지네이션
+    def get_all_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
+        page = int(self.request.query_params.get("page", 1))
+        size = int(self.request.query_params.get("size", 2))
+        queryset = self.get_queryset()
+        # 캐시 키 생성
+        cache_key = f"taro_chat_rooms_count_{request.user.id}"
+        # 캐시된 count 확인
+        total_count = cache.get(cache_key)
+        if total_count is None:
+            total_count = queryset.count()
+            # count 결과를 캐시에 5분간 저장
+            cache.set(cache_key, total_count, 300)
+
+        start = (page - 1) * size
+        paginated_queryset = queryset[start : start + size]
+        chat_contents = []
+
+        for chat_room in paginated_queryset:
+            contents_list = chat_room.contents_list
+            chat_log_list = []
+            card_list = TaroCardContents.objects.filter(room_id=chat_room.id).order_by("created_at")
+            # question,answer 쌍으로 데이터가 필요함으로 idx 2씩 증가
+            for idx in range(0, len(contents_list) - 1, 2):
+                question = contents_list[idx].content
+                answer = contents_list[idx + 1].content
+                # 나중에 함수화 시키기
+                card = card_list[idx // 2]
+                chat_log = TaroChatLogSerializer(
+                    data={
+                        "question": question,
+                        "content": answer,
+                        "card_name": card.card_name,
+                        "card_url": tarot_cards[card.card_name],
+                        "card_content": card.card_content,
+                        "card_direction": card.card_direction,
+                    }
+                )
+                if chat_log.is_valid(raise_exception=True):
+                    chat_log_list.append(chat_log.data)
+
+            serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+            if serializer.is_valid(raise_exception=True):
+                # 또 result_list에 append해줘야함 response말고
+                chat_contents.append(serializer.data)
+        # total_pages 반올림 구현
+        all_room_serializer = TaroChatAllRoomResponseSerializer(
+            data={
+                "page": page,
+                "size": size,
+                "total_count": total_count,
+                "total_pages": (total_count + size - 1) // size,
+                "chat_contents": chat_contents,
+            }
+        )
+        if all_room_serializer.is_valid(raise_exception=True):
+            return Response(all_room_serializer.data, status=status.HTTP_200_OK)
+
+
+# 로그 생성시에 캐쉬 재생성 (유저별로 캐쉬 다르게 해야함)

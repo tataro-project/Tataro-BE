@@ -43,3 +43,11 @@ class TaroChatLogSerializer(serializers.Serializer["TaroCardContents"]):
 class TaroChatRoomResponseSerializer(serializers.Serializer["TaroChatLogSerializer"]):
     room_id = serializers.IntegerField()
     chat_log = TaroChatLogSerializer(many=True)
+
+
+class TaroChatAllRoomResponseSerializer(serializers.Serializer["TaroChatRoomResponseSerializer"]):
+    page = serializers.IntegerField()
+    size = serializers.IntegerField()
+    total_count = serializers.IntegerField()
+    total_pages = serializers.IntegerField()
+    chat_contents = TaroChatRoomResponseSerializer(many=True)
