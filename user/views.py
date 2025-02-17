@@ -31,7 +31,7 @@ class UserView(APIView):
 
         # 사용자를 찾을 수 없는 경우 처리
         except User.DoesNotExist:
-            return Response({"message": "User Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "User Unauthorized(정보 조회)"}, status=status.HTTP_401_UNAUTHORIZED)
 
     @swagger_auto_schema(
         operation_summary="유저 정보 수정",
@@ -59,4 +59,29 @@ class UserView(APIView):
 
         # 사용자를 찾을 수 없는 경우 처리
         except User.DoesNotExist:
-            return Response({"message": "User Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "User Unauthorized(회원 정보 수정)"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def delete(self, request: Request) -> Response:
+        try:
+            # 현재 로그인한 사용자 정보 조회
+            user = User.objects.get(id=request.user.id)
+
+            # 사용자와 관련된 모든 데이터 삭제
+            # 주의: 이 부분은 모델 관계에 따라 조정이 필요할 수 있습니다
+            user.delete()
+
+            # 성공 응답 반환
+            return Response(
+                {"message": "회원 탈퇴 성공. 모든 사용자 데이터가 삭제되었습니다.", "status": "success"},
+                status=status.HTTP_200_OK,
+            )
+
+        except User.DoesNotExist:
+            # 사용자를 찾을 수 없는 경우 처리
+            return Response({"message": "사용자를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            # 기타 예외 처리
+            return Response(
+                {"message": f"회원 탈퇴 중 오류가 발생했습니다: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
