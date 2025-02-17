@@ -176,7 +176,7 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
         responses={200: TaroChatRoomResponseSerializer},
     )
     def get_newest_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
-        chat_room = self.get_queryset().order_by("-created_at").first()
+        chat_room = self.get_queryset().filter(user=request.user).order_by("-created_at").first()
         if not chat_room:
             raise ValidationError("채팅방을 찾을 수 없습니다")
         contents_list = chat_room.contents_list
@@ -215,7 +215,10 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
         current_chat_room = self.get_object()
         # created_at으로 비교하여 바로 전 채팅 로그 찾기
         chat_room = (
-            self.get_queryset().filter(created_at__lt=current_chat_room.created_at).order_by("-created_at").first()
+            self.get_queryset()
+            .filter(user=request.user, created_at__lt=current_chat_room.created_at)
+            .order_by("-created_at")
+            .first()
         )
         if not chat_room:
             raise ValidationError("채팅방을 찾을 수 없습니다")
@@ -263,7 +266,7 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
     def get_all_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
         page = int(self.request.query_params.get("page", 1))
         size = int(self.request.query_params.get("size", 2))
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().filter(user=request.user).order_by("-created_at")
         # 캐시 키 생성
         cache_key = f"taro_chat_rooms_count_{request.user.id}"
         # 캐시된 count 확인
