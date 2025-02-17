@@ -84,9 +84,11 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+# 더 추가해야 할 수 도있음
 CORS_ALLOW_HEADERS = [
     "content-type",
     "x-requested-with",
+    "Authorization",
 ]
 
 ROOT_URLCONF = "config.urls"
