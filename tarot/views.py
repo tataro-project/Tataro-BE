@@ -40,6 +40,8 @@ class TarotInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             chat_content = serializer.save()
+        total_count = TaroChatContents.objects.count()
+        cache.set(f"taro_chat_rooms_count_{request.user.id}", total_count, 300)
         content = request.data.get("content")
         if isinstance(content, str) and chat_content:
             prompt = TaroChatContents.init_tarot_prompt(content)
@@ -277,7 +279,8 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
             cache.set(cache_key, total_count, 300)
 
         start = (page - 1) * size
-        paginated_queryset = queryset[start : start + size]
+        end = min(start + size, total_count)
+        paginated_queryset = queryset[start:end]
         chat_contents = []
 
         for chat_room in paginated_queryset:
@@ -319,6 +322,3 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
         )
         if all_room_serializer.is_valid(raise_exception=True):
             return Response(all_room_serializer.data, status=status.HTTP_200_OK)
-
-
-# 로그 생성시에 캐쉬 재생성 (유저별로 캐쉬 다르게 해야함)
