@@ -1,0 +1,17 @@
+<!-- templates/payment/payment_form.html -->
+<form method="post" action="{% url 'payment:payment_request' %}">
+    {% csrf_token %}
+    <label>상품명:</label>
+    <input type="text" name="goods_name" value="코페이"><br>
+    <label>결제금액:</label>
+    <input type="text" name="price" value="1004"><br>
+    <label>구매자 이름:</label>
+    <input type="text" name="buyer_name" value="코페이"><br>
+    <label>구매자 연락처:</label>
+    <input type="text" name="buyer_tel" value="01000000000"><br>
+    <label>구매자 이메일:</label>
+    <input type="email" name="buyer_email" value="test@korpay.com"><br>
+    <label>주문번호:</label>
+    <input type="text" name="moid" value="korpay1234567890"><br>
+    <button type="submit">결제 요청</button>
+</form>

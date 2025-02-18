@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "notification.apps.NotificationConfig",
     "faq.apps.FaqConfig",
     "product.apps.ProductConfig",
+    "payment.apps.PaymentConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
     "helpers.apps.HelpersConfig",
@@ -156,18 +157,14 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-<<<<<<< HEAD
+
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
-=======
+],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-        # "rest_framework.permissions.AllowAny",
->>>>>>> develop
-    ],
+
 }
 
 CHANNEL_LAYERS = {
