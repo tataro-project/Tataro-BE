@@ -1,5 +1,6 @@
 from django import forms
 
+
 class PaymentForm(forms.Form):
     goods_name = forms.CharField(label="Product Name", max_length=100)
     price = forms.DecimalField(label="Price")

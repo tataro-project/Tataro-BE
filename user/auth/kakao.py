@@ -15,11 +15,8 @@ from user.models import User
 
 
 class KakaoLoginView(APIView):
-<<<<<<< HEAD
-=======
     permission_classes = [AllowAny]
 
->>>>>>> develop
     @swagger_auto_schema(operation_description="카카오 로그인 URL 반환", responses={200: "로그인 URL 반환 성공"})
     def get(self, request: Request) -> Response:
         kakao_login_url = (
@@ -33,11 +30,8 @@ class KakaoLoginView(APIView):
 
 
 class KakaoCallbackView(APIView):
-<<<<<<< HEAD
-=======
     permission_classes = [AllowAny]
 
->>>>>>> develop
     @swagger_auto_schema(
         operation_description="카카오 로그인 콜백 처리",
         responses={200: "사용자 정보 반환", 400: "Authorization code is missing"},

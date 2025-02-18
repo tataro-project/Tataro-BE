@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Payment(models.Model):
     merchant_id = models.CharField(max_length=255)
     goods_name = models.CharField(max_length=255)
@@ -19,5 +20,5 @@ class Payment(models.Model):
     pay_method = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Payment: {self.goods_name} - {self.price}"
