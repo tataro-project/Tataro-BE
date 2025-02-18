@@ -159,7 +159,15 @@ class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
                 if chat_log.is_valid(raise_exception=True):
                     chat_log_list.append(chat_log.data)
 
-        serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+        serializer = self.get_serializer(
+            data={
+                "room_id": chat_room.id,
+                "created_at": chat_room.created_at,
+                "updated_at": chat_room.updated_at,
+                "is_review": True if chat_room.reviews.count() else False,
+                "chat_log": chat_log_list,
+            }
+        )
         if serializer.is_valid(raise_exception=True):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -203,7 +211,15 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
             if chat_log.is_valid(raise_exception=True):
                 chat_log_list.append(chat_log.data)
 
-        serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+        serializer = self.get_serializer(
+            data={
+                "room_id": chat_room.id,
+                "created_at": chat_room.created_at,
+                "updated_at": chat_room.updated_at,
+                "is_review": True if chat_room.reviews.count() else False,
+                "chat_log": chat_log_list,
+            }
+        )
         if serializer.is_valid(raise_exception=True):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -246,7 +262,15 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
             if chat_log.is_valid(raise_exception=True):
                 chat_log_list.append(chat_log.data)
 
-        serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+        serializer = self.get_serializer(
+            data={
+                "room_id": chat_room.id,
+                "created_at": chat_room.created_at,
+                "updated_at": chat_room.updated_at,
+                "is_review": True if chat_room.reviews.count() else False,
+                "chat_log": chat_log_list,
+            }
+        )
         if serializer.is_valid(raise_exception=True):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -306,7 +330,15 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
                 if chat_log.is_valid(raise_exception=True):
                     chat_log_list.append(chat_log.data)
 
-            serializer = self.get_serializer(data={"room_id": chat_room.id, "chat_log": chat_log_list})
+            serializer = self.get_serializer(
+                data={
+                    "room_id": chat_room.id,
+                    "created_at": chat_room.created_at,
+                    "updated_at": chat_room.updated_at,
+                    "is_review": True if chat_room.reviews.count() else False,
+                    "chat_log": chat_log_list,
+                }
+            )
             if serializer.is_valid(raise_exception=True):
                 # 또 result_list에 append해줘야함 response말고
                 chat_contents.append(serializer.data)
