@@ -1,18 +1,26 @@
+from typing import cast
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from helpers.models import Category
 from helpers.pagination import CustomPageNumberPagination
+from helpers.utils import delete_from_ncp
+from user.models import User
 
 from .models import Notice
-from .serializers import NoticeSerializer
+from .serializers import CategorySerializer, NoticeSerializer
 
-User = get_user_model()
+
+class CategoryViewSet(viewsets.ModelViewSet):  # type: ignore
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 @swagger_auto_schema(
@@ -35,8 +43,8 @@ def notice_list_or_create(request: Request) -> Response:  # type: ignore
     if request.method == "GET":  # 공지사항 목록 조회
         notices = Notice.objects.all().order_by("-order", "-created_at")  # order 순 정렬, 최신순
         paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
-        paginated_faqs = paginator.paginate_queryset(notices, request)  # 페이지네이션 적용
-        serializer = NoticeSerializer(paginated_faqs, many=True)
+        paginated_notices = paginator.paginate_queryset(notices, request)  # 페이지네이션 적용
+        serializer = NoticeSerializer(paginated_notices, many=True)
         return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
 
     elif request.method == "POST":  # 공지사항 생성
@@ -45,6 +53,21 @@ def notice_list_or_create(request: Request) -> Response:  # type: ignore
             serializer.save(user=request.user)  # 작성자 저장
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_summary="카테고리 목록 조회",
+    operation_description="모든 카테고리 목록을 조회합니다.",
+    responses={200: CategorySerializer(many=True)},
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def category_list(request: Request) -> Response:
+    """카테고리 목록 조회"""
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
 
 
 @swagger_auto_schema(
@@ -84,7 +107,16 @@ def notice_detail_update_delete(request: Request, notice_id: int) -> Response:  
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == "DELETE":
-        if not isinstance(request.user, User) or not isinstance(notice.user, User) or request.user.id != notice.user.id:
+        if cast(User, request.user) != notice.user:
             return Response({"error": "삭제 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+        # 공지에 이미지 URL이 있는 경우 NCP에서 삭제
+        if notice.img_url:  # 이미지 URL 필드가 있다고 가정
+            try:
+                delete_from_ncp(notice.img_url)
+            except Exception as e:
+                return Response(
+                    {"error": f"이미지 삭제 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        # 공지 삭제
         notice.delete()
-        return Response({"message": "공지사항이 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "공지가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)

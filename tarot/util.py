@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from typing import Any
 
 import requests
@@ -15,13 +16,24 @@ class CompletionExecutor:
             "Authorization": self._api_key,
             "X-NCP-CLOVASTUDIO-REQUEST-ID": self._request_id,
             "Content-Type": "application/json; charset=utf-8",
-            "Accept": "text/event-stream",
+            "Accept": "application/json; charset=utf-8",
         }
         chat_response = ""
         with requests.post(
-            self._host + "/testapp/v1/chat-completions/HCX-003", headers=headers, json=completion_request, stream=True
+            self._host + "/testapp/v1/chat-completions/HCX-003",
+            headers=headers,
+            json=completion_request,
+            stream=True,
         ) as r:
             for line in r.iter_lines():
                 if line:
-                    chat_response + line.decode("utf-8")
-        return chat_response
+                    chat_response += line.decode("utf-8")
+        json_response = json.loads(chat_response)
+        try:
+            content = json_response["result"]["message"]["content"]
+            if type(content) == str:
+                return content
+            else:
+                return ""
+        except KeyError:
+            return ""

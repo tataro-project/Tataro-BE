@@ -11,17 +11,15 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import environ
-from dotenv import load_dotenv
 
-# 환경 변수 로드
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 # environ.Env.read_env()
 env_path = os.path.join(BASE_DIR, ".env")
@@ -34,12 +32,13 @@ if os.path.exists(env_path):
 SECRET_KEY = env("SECRET_KEY")
 
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = ["*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # django asgi 서버
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -54,17 +53,16 @@ INSTALLED_APPS = [
     "product.apps.ProductConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
+    "helpers.apps.HelpersConfig",
     # third_apps
     "rest_framework",
     "drf_yasg",
     "channels",  # Django Channels 추가
+    "corsheaders",
+    "rest_framework_simplejwt",
 ]
 
-# .env 파일 로드
-load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env.dev"))
-
-KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
-KAKAO_REDIRECT_URI = os.getenv("KAKAO_REDIRECT_URI")
+ASGI_APPLICATION = "config.asgi.application"  # daphne 서버 사용하도록 설정
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -74,6 +72,24 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # 추가
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://hakunamatatarot.com",
+    "http://localhost:8000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# 더 추가해야 할 수 도있음
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "x-requested-with",
+    "Authorization",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -115,6 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "user.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -139,11 +156,19 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
+<<<<<<< HEAD
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
+=======
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+        # "rest_framework.permissions.AllowAny",
+>>>>>>> develop
     ],
 }
-
 
 CHANNEL_LAYERS = {
     "default": {
@@ -160,4 +185,11 @@ NCP_STORAGE = {
     "SECRET_KEY": env("NCP_SECRET_KEY"),
     "BUCKET_NAME": "tataro-content",
     "ENDPOINT_URL": "https://kr.object.ncloudstorage.com",
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
