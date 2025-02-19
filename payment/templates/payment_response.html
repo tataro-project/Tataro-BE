@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=3.0">
+    <title>PAY RESULT</title>
+    <style>
+        .pop_wrap {background:rgba(0, 0, 0, 0.4);}
+        .tbl_th{box-sizing:border-box; line-height:40px; padding:0px 10px 0px 10px; text-align:left; width:160px; background:#e9eaeb; border-top:1px solid #2a323c; border-bottom:1px solid #d4d6d8; font-size:15px; font-weight:normal; color:#333; font-family:'Malgun Gothic','맑은 고딕',sans-serif;}
+        .tbl_td{box-sizing:border-box; line-height:40px; padding:0px 10px 0px 10px; text-align:left; border-top:1px solid #2a323c; border-bottom:1px solid #d4d6d8; font-size:15px; font-weight:bold; color:#333; font-family:'Malgun Gothic','맑은 고딕',sans-serif;}
+    </style>
+</head>
+<body>
+<div style="width: 100%; text-align: center;">
+    <div id="sampleInput" style="display: inline-block; padding:0 10px; margin:0 auto;">
+        <table style="border-spacing:0;">
+            <caption style="height:0;overflow:hidden;">결제 결과</caption>
+            <tbody>
+            <tr>
+                <td style="padding:24px 0 13px; border-bottom:6px solid #2a323c;"><h1 style="padding:0; margin:0; font-weight:normal; font-size:0;"><a href="javascript:void(0);" style="display:inline-block; border:none;"><img src="https://tklgrgstnnkv24381553.cdn.ntruss.com/public/img/logo.png" alt="Korpay" /></a></h1></td>
+                <td colspan="2" style="text-align:right; padding:0; border-bottom:6px solid #2a323c;"><p style="font-size:18px; color:#2a323c; font-family:'Malgun Gothic','맑은 고딕',sans-serif;">지불결제 토탈 서비스 <span style="color:#db0010; font-weight:bold; font-family:'Malgun Gothic','맑은 고딕',sans-serif;">코페이</span></p></td>
+            </tr>
+            <tr>
+                <td colspan="3"><p style="padding:38px 0 18px; text-align:center; letter-spacing:-3px; background:url('.https://mms.korpay.com/img/quotation.png') no-repeat center 51px; font-size:34px; color:#2a323c; font-family:'Malgun Gothic','맑은 고딕',sans-serif;">결제 결과</p></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <table style="border-collapse:collapse; width:100%">
+                        <tbody>
+                            <tr>
+                                <th scope="row" class="tbl_th">결과 내용</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">[{{ resultCode }}]{{ resultMsg }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">결제수단</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ payMethod }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">금액</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ amt }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">거래아이디</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ tid }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">승인번호</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ appNo }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">주문번호</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ ordNo }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">구매자명</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ ordNm }}&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">상품명</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ goodsName }}</td>
+                            </tr>
+                            <tbody class="card">
+                            <tr>
+                                <th scope="row" class="tbl_th">카드번호</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ cardNo }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">제휴사명</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ fnNm }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">할부개월</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ quota }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row" class="tbl_th">결제시간</th>
+                            </tr>
+                            <tr>
+                                <td class="tbl_td">{{ appDtm }}</td>
+                            </tr>
+                        </tbody>
+        </table>
+        </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <ul style="padding:25px 0 15px; margin:0; list-style:none;">
+                    <li style="padding:0 0 14px 5px !important; text-indent:-5px; font-size:14px; color:#333; letter-spacing:-1px; font-family:'Malgun Gothic','맑은 고딕',sans-serif;"> 결제 내용에 대한 문의는 해당 가맹점으로 문의바랍니다</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:135px; margin:0; padding:17px 0 0; border-top:6px solid #d4d6d8;"><img src="https://tklgrgstnnkv24381553.cdn.ntruss.com/public/img/logo.png" alt="Korpay" /></td>
+            <td style="padding:17px 0 0; border-top:6px solid #d4d6d8;" colspan="2">
+                <address style="padding:0 0 7px; line-height:1; font-size:13px; font-style:normal; color:#333; font-family:'Malgun Gothic','맑은 고딕',sans-serif;">(주)코페이 서울시 성동구 성수일로 77(성수동1가, 서울숲IT밸리) 608-611호</address>
+                <p style="padding:0; line-height:1; font-size:13px; color:#333; font-family:'Malgun Gothic','맑은 고딕',sans-serif;">고객센터 : 1644-3475</p>
+            </td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

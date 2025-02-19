@@ -1,132 +1,37 @@
 import hashlib
-import hmac
-import time
+import datetime
+from django.shortcuts import render
+from django.utils.crypto import get_random_string
 
-from django.conf import settings
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.views import View
-from django.views.decorators.csrf import csrf_exempt
+def payment_request(request):
+    merchant_key = "----"  # 상점키
+    merchant_id = "----"  # 상점아이디
+    goods_name = "코페이"  # 결제상품명
+    price = "1004"  # 결제상품금액
+    buyer_name = "코페이"  # 구매자명
+    buyer_tel = "01000000000"  # 구매자연락처
+    buyer_email = "test@korpay.com"  # 구매자메일주소
+    moid = get_random_string(16)  # 상품주문번호 (unique하게 생성)
+    return_url = "https://pgapi.korpay.com/returnUrlSample.do"  # 결과페이지(절대경로)
 
-from .forms import PaymentForm
-from .models import Payment
+    edi_date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")  # 전문 생성일시
+    hash_string = hashlib.sha256(
+        (merchant_id + edi_date + price + merchant_key).encode('utf-8')
+    ).hexdigest()  # Hash 값
 
-# Replace with your actual merchant ID and key (from settings or env vars!)
-MERCHANT_ID = "your_merchant_id"  # Replace
-MERCHANT_KEY = "your_merchant_key"  # Replace
-KORPAY_API_URL = "https://pgapi.korpay.com/payInit_hash.korpay"  # Replace
+    context = {
+        'merchantKey': merchant_key,
+        'merchantID': merchant_id,
+        'goodsName': goods_name,
+        'price': price,
+        'buyerName': buyer_name,
+        'buyerTel': buyer_tel,
+        'buyerEmail': buyer_email,
+        'moid': moid,
+        'returnURL': return_url,
+        'ediDate': edi_date,
+        'hashString': hash_string,
+    }
 
+    return render(request, 'payment/templates/payment_request.html', context)
 
-def generate_hash(merchant_id, edi_date, price, merchant_key) -> str:  # type: ignore
-    hash_string = merchant_id + edi_date + str(price) + merchant_key
-    hashed = hashlib.sha256(hash_string.encode("utf-8")).hexdigest()
-    return hashed
-
-
-class PaymentRequestView(View):
-    template_name = "payment/payment_request.html"
-
-    def get(self, request) -> HttpResponse:  # type: ignore
-        form = PaymentForm()
-        return render(request, self.template_name, {"form": form})
-
-    def post(self, request) -> HttpResponse:  # type: ignore
-        form = PaymentForm(request.POST)
-        if form.is_valid():
-            # Extract data from the form
-            goods_name = form.cleaned_data["goods_name"]
-            price = form.cleaned_data["price"]
-            buyer_name = form.cleaned_data["buyer_name"]
-            buyer_tel = form.cleaned_data["buyer_tel"]
-            buyer_email = form.cleaned_data["buyer_email"]
-            moid = form.cleaned_data["moid"]
-
-            # Generate edi_date and hash
-            edi_date = time.strftime("%Y%m%d%H%M%S")
-            hash_str = generate_hash(MERCHANT_ID, edi_date, price, MERCHANT_KEY)
-
-            # Create a Payment object (but don't save yet)
-            payment = Payment(
-                merchant_id=MERCHANT_ID,
-                goods_name=goods_name,
-                price=price,
-                buyer_name=buyer_name,
-                buyer_tel=buyer_tel,
-                buyer_email=buyer_email,
-                moid=moid,
-                return_url=request.build_absolute_uri(reverse("payment:payment_response")),  # Important: Full URL
-                edi_date=edi_date,
-                hash_str=hash_str,
-            )
-
-            # Prepare the context for the Korpay form submission
-            context = {
-                "form": form,
-                "merchant_id": MERCHANT_ID,
-                "goods_name": goods_name,
-                "price": price,
-                "buyer_name": buyer_name,
-                "buyer_tel": buyer_tel,
-                "buyer_email": buyer_email,
-                "moid": moid,
-                "return_url": payment.return_url,
-                "edi_date": edi_date,
-                "hash_str": hash_str,
-                "korpay_api_url": KORPAY_API_URL,
-            }
-            request.session["payment_data"] = {
-                "merchant_id": MERCHANT_ID,
-                "goods_name": goods_name,
-                "price": str(price),
-                "buyer_name": buyer_name,
-                "buyer_tel": buyer_tel,
-                "buyer_email": buyer_email,
-                "moid": moid,
-                "return_url": payment.return_url,
-                "edi_date": edi_date,
-                "hash_str": hash_str,
-            }
-
-            return render(request, "payment/payment_submit.html", context)
-        else:
-            return render(request, self.template_name, {"form": form})
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class PaymentResponseView(View):
-    template_name = "payment/payment_response.html"
-
-    def post(self, request) -> HttpResponse:  # type: ignore
-        payment_data = request.session.get("payment_data")
-
-        if not payment_data:
-            return HttpResponse("Payment data not found in session.", status=400)
-
-        result_code = request.POST.get("resultCd")
-        result_msg = request.POST.get("resultMsg")
-        tid = request.POST.get("tid")
-        app_no = request.POST.get("appNo")
-        card_no = request.POST.get("cardNo")
-        pay_method = request.POST.get("payMethod")
-
-        payment = Payment(**payment_data)
-        payment.result_code = result_code
-        payment.result_msg = result_msg
-        payment.tid = tid
-        payment.app_no = app_no
-        payment.card_no = card_no
-        payment.pay_method = pay_method
-        payment.save()
-
-        context = {
-            "result_code": result_code,
-            "result_msg": result_msg,
-            "tid": tid,
-            "app_no": app_no,
-            "card_no": card_no,
-            "pay_method": pay_method,
-            "payment": payment,
-        }
-        return render(request, self.template_name, context)
