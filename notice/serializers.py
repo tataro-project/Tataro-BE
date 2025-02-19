@@ -16,7 +16,7 @@ class NoticeSerializer(serializers.ModelSerializer):  # type: ignore
 
     class Meta:
         model = Notice
-        fields = '__all__'
+        fields = "__all__"
 
     def to_representation(self, instance):  # type: ignore
         representation = super().to_representation(instance)
