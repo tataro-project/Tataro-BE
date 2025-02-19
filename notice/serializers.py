@@ -16,7 +16,7 @@ class NoticeSerializer(serializers.ModelSerializer):  # type: ignore
 
     class Meta:
         model = Notice
-        fields = ["id", "title", "content", "img_url", "order", "user", "category"]
+        fields = '__all__'
 
     def to_representation(self, instance):  # type: ignore
         representation = super().to_representation(instance)
