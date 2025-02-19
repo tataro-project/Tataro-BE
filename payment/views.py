@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.utils.crypto import get_random_string
 
 
-def payment_request(request):
+def payment_request(request):  # type:ignore
     merchant_key = "----"  # 상점키
     merchant_id = "----"  # 상점아이디
     goods_name = "코페이"  # 결제상품명

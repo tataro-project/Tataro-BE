@@ -43,6 +43,7 @@ class Order(BaseModel):
 
 
 class BankTransfer(BaseModel):
+    # pending: 입금 진행중, complete: 입금 완료, canceled: 입금 취소, expired: 입금기한 만료, mismatch:입금 금액 불일치
     STATUS_CHOICES = (
         ("pending", "pending"),
         ("completed", "completed"),
@@ -56,6 +57,7 @@ class BankTransfer(BaseModel):
 
 
 class Payments(BaseModel):
+    # bank_transfer: 무통장결제, "" pending: 결제 진행중, complete: 결제 완료, failed: 결제 실패
     METHOD_CHOICES = (("bank_transfer", "bank_transfer"), ("port_one", "port_one"))
     STATUS_CHOICES = (("pending", "pending"), ("complete", "complete"), ("failed", "failed"))
     user = models.ForeignKey(User, on_delete=models.CASCADE)
