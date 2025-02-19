@@ -1,7 +1,9 @@
-import hashlib
 import datetime
+import hashlib
+
 from django.shortcuts import render
 from django.utils.crypto import get_random_string
+
 
 def payment_request(request):
     merchant_key = "----"  # 상점키
@@ -15,23 +17,20 @@ def payment_request(request):
     return_url = "https://pgapi.korpay.com/returnUrlSample.do"  # 결과페이지(절대경로)
 
     edi_date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")  # 전문 생성일시
-    hash_string = hashlib.sha256(
-        (merchant_id + edi_date + price + merchant_key).encode('utf-8')
-    ).hexdigest()  # Hash 값
+    hash_string = hashlib.sha256((merchant_id + edi_date + price + merchant_key).encode("utf-8")).hexdigest()  # Hash 값
 
     context = {
-        'merchantKey': merchant_key,
-        'merchantID': merchant_id,
-        'goodsName': goods_name,
-        'price': price,
-        'buyerName': buyer_name,
-        'buyerTel': buyer_tel,
-        'buyerEmail': buyer_email,
-        'moid': moid,
-        'returnURL': return_url,
-        'ediDate': edi_date,
-        'hashString': hash_string,
+        "merchantKey": merchant_key,
+        "merchantID": merchant_id,
+        "goodsName": goods_name,
+        "price": price,
+        "buyerName": buyer_name,
+        "buyerTel": buyer_tel,
+        "buyerEmail": buyer_email,
+        "moid": moid,
+        "returnURL": return_url,
+        "ediDate": edi_date,
+        "hashString": hash_string,
     }
 
-    return render(request, 'payment/templates/payment_request.html', context)
-
+    return render(request, "payment/templates/payment_request.html", context)
