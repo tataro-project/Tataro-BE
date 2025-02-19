@@ -1,6 +1,7 @@
 from typing import cast
 
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, viewsets
@@ -11,7 +12,7 @@ from rest_framework.response import Response
 
 from helpers.models import Category
 from helpers.pagination import CustomPageNumberPagination
-from helpers.utils import delete_from_ncp
+from helpers.utils import delete_from_ncp, upload_to_ncp
 from user.models import User
 
 from .models import Notice
@@ -47,10 +48,17 @@ def notice_list_or_create(request: Request) -> Response:  # type: ignore
         serializer = NoticeSerializer(paginated_notices, many=True)
         return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
 
-    elif request.method == "POST":  # 공지사항 생성
+    elif request.method == "POST":
+        data = request.data.copy()
+        file = request.FILES.get("image")  # 프론트에서 "image" 필드로 파일을 전송해야 함
+        cate = "review"
+        if file and isinstance(file, InMemoryUploadedFile):
+            img_url = upload_to_ncp(cate, file)  # 네이버 클라우드에 업로드 후 URL 반환
+            data["img_url"] = img_url
+
         serializer = NoticeSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)  # 작성자 저장
+            serializer.save(user=cast(User, request.user))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
