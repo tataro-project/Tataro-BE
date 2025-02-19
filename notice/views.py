@@ -65,21 +65,6 @@ def notice_list_or_create(request: Request) -> Response:  # type: ignore
 
 @swagger_auto_schema(
     method="get",
-    operation_summary="카테고리 목록 조회",
-    operation_description="모든 카테고리 목록을 조회합니다.",
-    responses={200: CategorySerializer(many=True)},
-)
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def category_list(request: Request) -> Response:
-    """카테고리 목록 조회"""
-    categories = Category.objects.all()
-    serializer = CategorySerializer(categories, many=True)
-    return Response(serializer.data)
-
-
-@swagger_auto_schema(
-    method="get",
     operation_summary="공지 상세 조회",
     operation_description="특정 공지의 상세 정보를 조회합니다.",
     responses={200: NoticeSerializer, 404: "공지를 찾을 수 없음"},
@@ -128,3 +113,40 @@ def notice_detail_update_delete(request: Request, notice_id: int) -> Response:  
         # 공지 삭제
         notice.delete()
         return Response({"message": "공지가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_summary="공지사항 카테고리 목록 조회",
+    operation_description="use_on 필드가 'notice'인 모든 카테고리 목록을 조회합니다.",
+    responses={200: CategorySerializer(many=True)},
+)
+@swagger_auto_schema(
+    method="post",
+    operation_summary="공지사항 카테고리 생성",
+    operation_description="새로운 공지사항 카테고리를 생성합니다. 관리자 권한이 필요합니다. use_on 필드는 자동으로 'notice'로 설정됩니다.",
+    request_body=CategorySerializer,
+    responses={201: CategorySerializer, 400: "잘못된 요청"},
+)
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def category_list_or_create(request: Request) -> Response:  # type: ignore
+    if request.method == "GET":
+        """공지사항 카테고리 목록 조회"""
+        categories = Category.objects.filter(use_on="notice")
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        """공지사항 카테고리 생성"""
+        if not request.user.is_staff:
+            return Response({"error": "관리자 권한이 필요합니다."}, status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data.copy()
+        data["use_on"] = "notice"  # use_on 필드를 자동으로 "notice"로 설정
+
+        serializer = CategorySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

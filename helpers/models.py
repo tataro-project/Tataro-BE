@@ -12,6 +12,7 @@ class BaseModel(models.Model):
 class Category(BaseModel):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True, null=True)
+    use_on = models.CharField(max_length=20, null=True)
 
     def __str__(self):  # type: ignore
         return self.name
