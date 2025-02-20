@@ -24,6 +24,7 @@ djangorestframework-simplejwt = "^5.4.0"
 python-dotenv = "^1.0.1"
 daphne = "3.0.2"
 channels = "3.0.5"
+portone-server-sdk = "^0.13.0"
 
 
 

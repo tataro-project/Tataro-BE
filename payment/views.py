@@ -1,36 +1,38 @@
-import datetime
-import hashlib
+from django.http import JsonResponse
+from django.views import View
+# from portone import PortOne
+from django.conf import settings
 
-from django.shortcuts import render
-from django.utils.crypto import get_random_string
+# 환경 변수에서 API 키 및 시크릿 키 가져오기
+IMP_KEY = settings.PORTONE_API_KEY
+IMP_SECRET = settings.PORTONE_API_SECRET
+
+# PortOne 클라이언트 초기화
+portone = PortOne(imp_key=IMP_KEY, imp_secret=IMP_SECRET)
 
 
-def payment_request(request):  # type:ignore
-    merchant_key = "----"  # 상점키
-    merchant_id = "----"  # 상점아이디
-    goods_name = "코페이"  # 결제상품명
-    price = "1004"  # 결제상품금액
-    buyer_name = "코페이"  # 구매자명
-    buyer_tel = "01000000000"  # 구매자연락처
-    buyer_email = "test@korpay.com"  # 구매자메일주소
-    moid = get_random_string(16)  # 상품주문번호 (unique하게 생성)
-    return_url = "https://pgapi.korpay.com/returnUrlSample.do"  # 결과페이지(절대경로)
+class VerifyPaymentView(View):
+    def post(self, request):
+        """결제 검증 API"""
+        imp_uid = request.POST.get("imp_uid")  # 클라이언트에서 전달한 결제 고유번호
 
-    edi_date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")  # 전문 생성일시
-    hash_string = hashlib.sha256((merchant_id + edi_date + price + merchant_key).encode("utf-8")).hexdigest()  # Hash 값
+        if not imp_uid:
+            return JsonResponse({"error": "결제 정보가 없습니다."}, status=400)
 
-    context = {
-        "merchantKey": merchant_key,
-        "merchantID": merchant_id,
-        "goodsName": goods_name,
-        "price": price,
-        "buyerName": buyer_name,
-        "buyerTel": buyer_tel,
-        "buyerEmail": buyer_email,
-        "moid": moid,
-        "returnURL": return_url,
-        "ediDate": edi_date,
-        "hashString": hash_string,
-    }
+        try:
+            # 결제 정보 조회
+            payment_data = portone.find_payment(imp_uid)
 
-    return render(request, "payment/templates/payment_request.html", context)
+            if not payment_data:
+                return JsonResponse({"error": "결제 정보를 찾을 수 없습니다."}, status=400)
+
+            # 데이터베이스에서 주문 정보와 비교 (예: 주문 금액 검증)
+            order_amount = 10000  # 실제 DB에서 주문 금액을 가져와야 함
+            if payment_data.amount != order_amount:
+                return JsonResponse({"error": "결제 금액 불일치"}, status=400)
+
+            # 결제 성공 처리 (DB 업데이트 등)
+            return JsonResponse({"message": "결제 검증 완료", "data": payment_data.dict()})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
