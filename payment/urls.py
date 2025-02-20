@@ -1,10 +1,7 @@
 from django.urls import path
-
-from . import views
-
-app_name = "payment"
+from .views import VerifyPaymentView, PaymentWebhookView
 
 urlpatterns = [
-    path("request/", views.payment_request, name="payment_request"),
-    # path("response/", views.PaymentResponseView.as_view(), name="payment_response"),
+    path("verify/", VerifyPaymentView.as_view(), name="verify_payment"),
+    path("webhook/", PaymentWebhookView.as_view(), name="payment_webhook"),
 ]

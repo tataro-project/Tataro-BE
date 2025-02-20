@@ -1,14 +1,11 @@
 from django.http import JsonResponse
 from django.views import View
-# from portone import PortOne
+import portone_server_sdk as portone
+from portone_server_sdk._generated.payment.client import PaymentClient
 from django.conf import settings
 
-# 환경 변수에서 API 키 및 시크릿 키 가져오기
-IMP_KEY = settings.PORTONE_API_KEY
-IMP_SECRET = settings.PORTONE_API_SECRET
-
 # PortOne 클라이언트 초기화
-portone = PortOne(imp_key=IMP_KEY, imp_secret=IMP_SECRET)
+portone_client = PaymentClient(secret=settings.PORTONE_API_SECRET or "")
 
 
 class VerifyPaymentView(View):
@@ -21,7 +18,7 @@ class VerifyPaymentView(View):
 
         try:
             # 결제 정보 조회
-            payment_data = portone.find_payment(imp_uid)
+            payment_data = portone_client.get_payment(imp_uid)
 
             if not payment_data:
                 return JsonResponse({"error": "결제 정보를 찾을 수 없습니다."}, status=400)
@@ -33,6 +30,31 @@ class VerifyPaymentView(View):
 
             # 결제 성공 처리 (DB 업데이트 등)
             return JsonResponse({"message": "결제 검증 완료", "data": payment_data.dict()})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+
+class PaymentWebhookView(View):
+    def post(self, request):
+        """PortOne 결제 웹훅 처리"""
+        imp_uid = request.POST.get("imp_uid")
+        status = request.POST.get("status")
+
+        if not imp_uid or not status:
+            return JsonResponse({"error": "잘못된 요청"}, status=400)
+
+        try:
+            # 결제 정보 가져오기
+            payment_data = portone_client.get_payment(imp_uid)
+
+            if not payment_data:
+                return JsonResponse({"error": "결제 정보를 찾을 수 없습니다."}, status=400)
+
+            # 결제 상태 업데이트 (DB 반영)
+            # 예: Order.objects.filter(imp_uid=imp_uid).update(status=status)
+
+            return JsonResponse({"message": "결제 상태 업데이트 완료"})
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
