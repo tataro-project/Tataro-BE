@@ -48,6 +48,7 @@ urlpatterns = [
     # payment path
     path("api/v1/product/", include("product.urls")),  # product 앱 api 경로 추가
     path("api/v1/payment/", include("payment.urls")),  # payment 앱 api 경로 추가
+    path("api/v1/payment/bank", include("bankpay.urls")),  # payment 앱 api 경로 추가
     # notification path
     path("ws/notifications/", NotificationConsumer.as_asgi()),
     # path("api/v1/", include("user.urls")),
