@@ -187,3 +187,5 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+
+CSRF_TRUSTED_ORIGINS = ["https://hakunamatatarot.com"]
