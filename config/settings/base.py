@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     "notice.apps.NoticeConfig",
     "notification.apps.NotificationConfig",
     "faq.apps.FaqConfig",
+    "product.apps.ProductConfig",
+    "payment.apps.PaymentConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
     "helpers.apps.HelpersConfig",
@@ -96,7 +98,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [BASE_DIR / ""],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -155,12 +157,11 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-        # "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
 

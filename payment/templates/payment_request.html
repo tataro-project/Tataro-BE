@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=3.0">
+    <title>결제 TEST</title>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <style>
+        #mask {position:absolute;z-index:9000;background-color:#000;display:none;left:0;top:0;width:100%;height:100%;}
+        .window {display: none;position:fixed;top:0%;width:100%;height:100%;z-index:10000;}
+        .cont{width:100%;height:100%;}
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+
+    var url = "https://pgapi.korpay.com";
+    $(document).ready(function() {
+
+//결제창 요청시 실행됩니다.
+        $("#payBtn").click(function (){
+
+            if($("#id").val() == ''){
+                alert("결제 방법을 선택하세요.");
+                return;
+            }
+
+            // Calculate mask size
+            var maskHeight = $(document).height();
+            var maskWidth = $(document).width();
+
+            $("#mask").fadeIn(0);
+            $("#mask").fadeTo("slow", 0.6);
+
+            document.payInit.action = url + "/payInit_hash.korpay";
+            document.payInit.submit();
+            $(".window").show();
+        });
+
+        //결제창 종료 함수 <<수정 불가능>>
+        window.addEventListener("message", returnData, false);
+    });
+
+    //결제창 종료 함수 <<'returnData' 수정 불가능>>
+    function returnData (e){
+        if (e.data != ""){
+            var div = document.createElement('div');
+            div.setAttribute('id', 'sendData');
+            document.body.appendChild(div);
+            document.getElementById("sendData").innerHTML = e.data;
+            document.transRslt.submit();
+        }
+        $("#mask, .window").hide();
+        $("#pay_frame").attr("src", "");
+    }
+</script>
+<div style="text-align:center;">
+    <div id="sampleInput" class="paypop_con" style="padding:20px 15px 35px 15px;display: inline-block;float: inherit;">
+        <p class="square_tit mt0" style="text-align:center;"><strong>결제정보</strong></p>
+        <form name="payInit" method="post" target="pay_frame">
+            <table class="tbl_sty02">
+                <!-- 필수값 입력 영역 -->
+                <tr>
+                    <td>결제수단(card, vacnt, phone)</td>
+                    <td><input type="text" name="payMethod" value="card"></td>
+                </tr>
+                <tr>
+                    <td>상점아이디</td>
+                    <td><input type="text" name="id" value="{{ merchantID }}"></td>
+                </tr>
+                <tr>
+                    <td>상품명</td>
+                    <td><input type="text" name="goodsName" value="{{ goodsName }}" maxlength="100"></td>
+                </tr>
+                <tr>
+                    <td>주문번호</td>
+                    <td><input type="text" name="orderNo" value="{{ moid }}" maxlength="40"></td>
+                </tr>
+                <tr>
+                    <td>결제금액</td>
+                    <td><input type="text" name="amt" value="{{ price }}"></td>
+                </tr>
+                <tr>
+                    <td>returnUrl</td>
+                    <td><input type="text" name="returnUrl" value="{{ returnURL }}"></td>
+                </tr>
+
+                <!-- 변경 불가능 -->
+                <input type="hidden" name="ediDate" value="{{ ediDate }}">
+                <input type="hidden" name="hashStr" value="{{ hashString }}">
+
+                <!-- 옵션값 입력 영역 -->
+                <tr>
+                    <td colspan="2" style="padding: 20px 0;">
+                        <p style="font-weight: bold; margin: 0;">옵션 정보</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>구매자 이름</td>
+                    <td><input type="text" name="buyerName" value="{{ buyerName }}" maxlength="30"></td>
+                </tr>
+
+                <tr>
+                    <td>구매자 전화번호</td>
+                    <td><input type="text" name="buyerTel" value="{{ buyerTel }}" maxlength="20"></td>
+                </tr>
+
+                <tr>
+                    <td>구매자 이메일</td>
+                    <td><input type="text" name="buyerEmail" value="{{ buyerEmail }}" maxlength="60"></td>
+                </tr>
+
+                <tr>
+                    <td>구매자 주소</td>
+                    <td><input type="text" name="buyerAddr" value="서울특별시 성동구 성수일로 77 서울숲아이티밸리 608~611호" maxlength="100"></td>
+                </tr>
+
+                <tr>
+                    <td>구매자 우편번호</td>
+                    <td><input type="text" name="buyerPostNo" value="04790" maxlength="6"></td>
+                </tr>
+
+                <tr>
+                    <td>구매자 IP</td>
+                    <td><input type="text" name="userIp" value="127.0.0.1" maxlength="100"></td>
+                </tr>
+
+                <tr>
+                    <td>예비 파라미터</td>
+                    <td><input type="text" name="reqReserved" value="reqReserved" maxlength="200"></td>
+                </tr>
+
+            </table>
+        </form>
+
+        <a href="#;" id="payBtn" class="btn_sty01 bg01" style="margin:15px;">결제하기</a>
+    </div>
+</div>
+<div id="mask"></div>
+<div class="window">
+    <div class="cont">
+        <iframe id="pay_frame" name="pay_frame" style="width:100%; height:100%;" src="" marginwidth="0" marginheight="0" frameborder="no" scrolling="no"></iframe>
+    </div>
+</div>
+</body>
+</html>

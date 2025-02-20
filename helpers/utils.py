@@ -13,9 +13,8 @@ def upload_to_ncp(cate: str, file):  # type: ignore
         aws_secret_access_key=ncp_config["SECRET_KEY"],
         endpoint_url=ncp_config["ENDPOINT_URL"],
     )
-
     file_extension = file.name.split(".")[-1]
-    file_name = f"content/{cate}/{uuid.uuid4()}.{file_extension}"  # 고유한 파일명 생성
+    file_name = f"{cate}/{uuid.uuid4()}.{file_extension}"  # 고유한 파일명 생성
 
     s3_client.upload_fileobj(
         file,
