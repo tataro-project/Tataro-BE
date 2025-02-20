@@ -164,7 +164,6 @@ class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
                 "room_id": chat_room.id,
                 "created_at": chat_room.created_at,
                 "updated_at": chat_room.updated_at,
-                "is_review": True if chat_room.reviews.count() else False,
                 "chat_log": chat_log_list,
             }
         )
@@ -216,7 +215,6 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
                 "room_id": chat_room.id,
                 "created_at": chat_room.created_at,
                 "updated_at": chat_room.updated_at,
-                "is_review": True if chat_room.reviews.count() else False,
                 "chat_log": chat_log_list,
             }
         )
@@ -267,7 +265,6 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
                 "room_id": chat_room.id,
                 "created_at": chat_room.created_at,
                 "updated_at": chat_room.updated_at,
-                "is_review": True if chat_room.reviews.count() else False,
                 "chat_log": chat_log_list,
             }
         )
@@ -329,18 +326,17 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
                 )
                 if chat_log.is_valid(raise_exception=True):
                     chat_log_list.append(chat_log.data)
-
+            review = chat_room.reviews.first()
             serializer = self.get_serializer(
                 data={
                     "room_id": chat_room.id,
                     "created_at": chat_room.created_at,
                     "updated_at": chat_room.updated_at,
-                    "is_review": True if chat_room.reviews.count() else False,
+                    "review_id": review.id if review else None,
                     "chat_log": chat_log_list,
                 }
             )
             if serializer.is_valid(raise_exception=True):
-                # 또 result_list에 append해줘야함 response말고
                 chat_contents.append(serializer.data)
         # total_pages 반올림 구현
         all_room_serializer = TaroChatAllRoomResponseSerializer(
