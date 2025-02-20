@@ -44,7 +44,7 @@ class TaroChatRoomResponseSerializer(serializers.Serializer["TaroChatLogSerializ
     room_id = serializers.IntegerField()
     created_at = serializers.DateTimeField()
     updated_at = serializers.DateTimeField()
-    is_review = serializers.BooleanField()
+    review_id = serializers.IntegerField(required=False, allow_null=True)
     chat_log = TaroChatLogSerializer(many=True)
 
 
