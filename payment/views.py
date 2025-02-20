@@ -6,7 +6,7 @@ from portone_server_sdk._generated.payment.client import PaymentClient
 
 from config.settings.base import env
 
-# PortOne 클라이언트 초기화
+# PortOne 클라이언트 초기화..
 portone_client = PaymentClient(secret=env.PORTONE_API_SECRET or "")
 
 
