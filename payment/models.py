@@ -4,6 +4,35 @@ from helpers.models import BaseModel
 from user.models import User
 
 
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+class Portone(BaseModel):
+    class StatusChoices(models.TextChoices):
+        PENDING = "pending", _("결제 대기")
+        PAID = "paid", _("결제 완료")
+        FAILED = "failed", _("결제 실패")
+        CANCELLED = "cancelled", _("결제 취소")
+        REFUNDED = "refunded", _("환불 완료")
+
+    imp_uid = models.CharField(max_length=50, unique=True, verbose_name="포트원 결제 고유번호")
+    merchant_uid = models.CharField(max_length=50, unique=True, verbose_name="가맹점 주문번호")
+    amount = models.PositiveIntegerField(verbose_name="결제 금액")
+    status = models.CharField(
+        max_length=10,
+        choices=StatusChoices.choices,
+        default=StatusChoices.PENDING,
+        verbose_name="결제 상태"
+    )
+    buyer_email = models.EmailField(verbose_name="구매자 이메일", null=True, blank=True)
+    buyer_name = models.CharField(max_length=100, verbose_name="구매자 이름", null=True, blank=True)
+    buyer_tel = models.CharField(max_length=20, verbose_name="구매자 전화번호", null=True, blank=True)
+
+
+    def __str__(self):
+        return f"{self.merchant_uid} - {self.status}"
+
+
 class Payment(models.Model):
     merchant_id = models.CharField(max_length=255)
     goods_name = models.CharField(max_length=255)
