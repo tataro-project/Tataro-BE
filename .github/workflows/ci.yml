@@ -20,7 +20,7 @@ jobs:
       NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
       NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
       NAVER_REDIRECT_URI: ${{ secrets.NAVER_REDIRECT_URI }}
-
+      PORTONE_API_SECRET: ${{ secrets.PORTONE_API_SECRET }}
 
     services:
       postgres:
@@ -75,6 +75,7 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           NCP_ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           NCP_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          PORTONE_API_SECRET: ${{ secrets.PORTONE_API_SECRET }}
         run: |
           poetry run mypy .
 
@@ -83,5 +84,6 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           NCP_ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           NCP_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          PORTONE_API_SECRET: ${{ secrets.PORTONE_API_SECRET }}
         run: |
           poetry run python manage.py test
