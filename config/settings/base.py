@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
     "helpers.apps.HelpersConfig",
+    "bankpay.apps.BankpayConfig",
     # third_apps
     "rest_framework",
     "drf_yasg",
