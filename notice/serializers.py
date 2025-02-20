@@ -16,5 +16,3 @@ class NoticeSerializer(serializers.ModelSerializer):  # type: ignore
     class Meta:
         model = Notice
         fields = "__all__"
-
-
