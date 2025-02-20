@@ -186,4 +186,4 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://hakunamatatarot.com']
+CSRF_TRUSTED_ORIGINS = ["https://hakunamatatarot.com"]
