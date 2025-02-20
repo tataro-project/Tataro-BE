@@ -1,14 +1,20 @@
+import os
+
 import environ
 import portone_server_sdk as portone
-from django.conf import settings
 from django.http import JsonResponse
 from django.views import View
 from portone_server_sdk._generated.payment.client import PaymentClient
 
+from config.settings.base import BASE_DIR
+
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
 
 # PortOne 클라이언트 초기화..
-portone_client = PaymentClient(secret=env("PORTONE_API_SECRET") or "")
+portone_client = PaymentClient(secret=env("PORTONE_API_SECRET"))
+env_path = os.path.join(BASE_DIR, ".env")
+if os.path.exists(env_path):
+    environ.Env.read_env(env_path)
 
 
 class VerifyPaymentView(View):
