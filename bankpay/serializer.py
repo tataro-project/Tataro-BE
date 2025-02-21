@@ -17,6 +17,7 @@ class AdminAccountSerializer(serializers.Serializer):  # type:ignore
 
 
 class BankTransferGetResponseSerializer(serializers.Serializer):  # type:ignore
+    product_id = serializers.IntegerField()
     payments_id = serializers.IntegerField()
     purchase_date = serializers.DateTimeField(default_timezone=timezone.get_default_timezone())
     quantity = serializers.IntegerField(default=1)
