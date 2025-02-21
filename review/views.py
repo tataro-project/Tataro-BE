@@ -40,7 +40,7 @@ def review_list_or_create(request: Request) -> Response:  # type: ignore
         if sort_by == "date":
             reviews = Review.objects.select_related("user").order_by("-created_at")
         else:
-            reviews = Review.objects.select_related("user").order_by("view_count")
+            reviews = Review.objects.select_related("user").order_by("-view_count")
         paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
         paginated_reviews = paginator.paginate_queryset(reviews, request)  # 페이지네이션 적용
         serializer = ReviewSerializer(paginated_reviews, many=True)
