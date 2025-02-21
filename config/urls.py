@@ -47,6 +47,7 @@ urlpatterns = [
     path("api/v1/faq/", include("faq.urls")),
     # payment path
     path("api/v1/product/", include("product.urls")),  # product 앱 api 경로 추가
+    path("api/v1/order/", include("order.urls")),
     path("api/v1/payment/", include("payment.urls")),  # payment 앱 api 경로 추가
     path("api/v1/payment/bank", include("bankpay.urls")),  # payment 앱 api 경로 추가
     # notification path

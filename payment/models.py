@@ -1,5 +1,3 @@
-from datetime import timezone
-
 from django.db import models
 from django.utils.timezone import now
 
@@ -28,7 +26,7 @@ class Payment(models.Model):
     transaction_time = models.DateTimeField(auto_now_add=True)  # 결제 시각
     updated_at = models.DateTimeField(auto_now=True)  # 결제 내역 업데이트 시각
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"결제 {self.merchant_uid} - {self.status}"
 
 
@@ -42,15 +40,11 @@ class Refund(models.Model):
     payment = models.OneToOneField(Payment, on_delete=models.CASCADE, related_name="refund")  # 1:1 관계
     refund_amount = models.PositiveIntegerField()  # 환불 금액
     reason = models.TextField(blank=True, null=True)  # 환불 사유
-    status = models.CharField(
-        max_length=20,
-        choices=StatusChoices.choices,
-        default=StatusChoices.REQUESTED
-    )
+    status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.REQUESTED)
     requested_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(blank=True, null=True)  # 환불 완료 시간
 
-    def mark_as_completed(self):
+    def mark_as_completed(self):  # type: ignore
         """환불 완료 상태로 변경"""
         self.status = self.StatusChoices.COMPLETED
         self.completed_at = now()

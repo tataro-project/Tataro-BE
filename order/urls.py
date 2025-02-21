@@ -1,11 +1,11 @@
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
-from order.views import CreatePaymentView
+from .views import OrderViewSet
 
+router = DefaultRouter()
+router.register("", OrderViewSet)  # 'orders/' 엔드포인트 생성
 
 urlpatterns = [
-    # order api url
-    path("order_create", CreatePaymentView.as_view(), name="order_create"),
-
-
+    path("", include(router.urls)),
 ]

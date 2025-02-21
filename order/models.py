@@ -1,7 +1,9 @@
 from django.db import models
+
 from helpers.models import BaseModel
 from product.models import Product
 from user.models import User
+
 
 class Order(BaseModel):
     class StatusChoices(models.TextChoices):
@@ -19,5 +21,5 @@ class Order(BaseModel):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)  # 총 결제 금액
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.PENDING)  # 주문 상태
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"주문 {self.order_id} - {self.user.username} ({self.status})"

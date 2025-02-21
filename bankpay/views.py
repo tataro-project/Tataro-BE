@@ -36,10 +36,10 @@ class BankTransferView(APIView):
             )
             payments = Payment.objects.create(
                 user=request.user,
-                bank_transfer=bank_transfer,
+                # bank_transfer=bank_transfer,
                 order=order,
                 amount=int(product.price * order.count),
-                method="bank_transfer",
+                # method="bank_transfer",
                 status="pending",
             )
             data = {"admin_account": self.ADMIN_ACCOUNT, "payments_id": payments.id}

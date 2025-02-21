@@ -5,17 +5,10 @@ import environ
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
-from drf_yasg.utils import swagger_auto_schema
 from portone_server_sdk._generated.payment.client import PaymentClient
-from rest_framework import status, viewsets, permissions
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from config.settings.base import BASE_DIR
 from payment.models import Payment
-from product.models import Product
-from order.serializers import OrderSerializer
 
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
 
@@ -27,7 +20,7 @@ if os.path.exists(env_path):
 
 
 class VerifyPaymentView(View):
-    def post(self, request):
+    def post(self, request):  # type: ignore
         """결제 검증 API"""
         imp_uid = request.POST.get("imp_uid")
 
@@ -36,7 +29,7 @@ class VerifyPaymentView(View):
 
         try:
             # PortOne에서 결제 정보 조회
-            payment_data = portone_client.get_payment(imp_uid)
+            payment_data = portone_client.get_payment(imp_uid)  # type: ignore
 
             if not payment_data:
                 return JsonResponse({"error": "결제 정보를 찾을 수 없습니다."}, status=400)
@@ -48,11 +41,11 @@ class VerifyPaymentView(View):
                 return JsonResponse({"error": "DB에서 결제 정보를 찾을 수 없습니다."}, status=400)
 
             # 결제 금액 검증
-            if payment.amount != payment_data.amount:
+            if payment.amount != payment_data.amount:  # type: ignore
                 return JsonResponse({"error": "결제 금액 불일치"}, status=400)
 
             # 결제 상태 업데이트
-            payment.status = payment_data.status
+            payment.status = payment_data.status  # type: ignore
             payment.save()
 
             return JsonResponse({"message": "결제 검증 완료", "data": {"status": payment.status}})
@@ -62,7 +55,7 @@ class VerifyPaymentView(View):
 
 
 class PaymentWebhookView(View):
-    def post(self, request):
+    def post(self, request):  # type: ignore
         """PortOne 결제 웹훅 처리"""
         imp_uid = request.POST.get("imp_uid")
         status = request.POST.get("status")
@@ -88,7 +81,7 @@ class PaymentWebhookView(View):
 
 
 class CreatePaymentView(View):
-    def post(self, request):
+    def post(self, request):  # type: ignore
         """결제 요청 API"""
         merchant_uid = request.POST.get("merchant_uid")
         amount = request.POST.get("amount")
@@ -103,14 +96,11 @@ class CreatePaymentView(View):
         payment = Payment.objects.create(
             merchant_uid=merchant_uid,
             amount=int(amount),
-            buyer_email=buyer_email,
-            buyer_name=buyer_name,
-            buyer_tel=buyer_tel,
             status="pending",
         )
 
         return JsonResponse({"message": "결제 요청 생성 완료", "payment_id": payment.id})
 
 
-def payment_page(request):
+def payment_page(request):  # type: ignore
     return render(request, "payment_request.html")
