@@ -9,12 +9,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-<<<<<<< HEAD
-from bankpay.models import BankTransfer
-from bankpay.serializer import AdminAccountSerializer, BankTransferRequestSerializer
-from order.models import Order
-from payment.models import Payment
-=======
 from bankpay.models import BankOrders, BankPayments, BankTransfer
 from bankpay.serializer import (
     AdminAccountSerializer,
@@ -22,7 +16,6 @@ from bankpay.serializer import (
     BankTransferGetResponseSerializer,
     BankTransferRequestSerializer,
 )
->>>>>>> develop
 from product.models import Product
 
 
@@ -40,26 +33,18 @@ class BankTransferView(APIView):
         req_serial = BankTransferRequestSerializer(data=request.data)
         if req_serial.is_valid(raise_exception=True):
             product = get_object_or_404(Product, id=req_serial.data.get("product_id"))
-<<<<<<< HEAD
-            order = Order.objects.create(product=product, user=request.user)
-=======
             order = BankOrders.objects.create(product=product, user=request.user)
->>>>>>> develop
             bank_transfer = BankTransfer.objects.create(  # type:ignore
                 name=req_serial.data.get("name"),
                 deadline=timezone.now() + timedelta(hours=self.PAYMENT_DEADLINE_HOURS),
                 status="pending",
             )
-<<<<<<< HEAD
-            payments = Payment.objects.create(
-=======
             payments = BankPayments.objects.create(
->>>>>>> develop
                 user=request.user,
-                # bank_transfer=bank_transfer,
+                bank_transfer=bank_transfer,
                 order=order,
                 amount=int(product.price * order.count),
-                # method="bank_transfer",
+                method="bank_transfer",
                 status="pending",
             )
             # 내역 새로 생성될때 캐쉬 업데이트
