@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "notification.apps.NotificationConfig",
     "faq.apps.FaqConfig",
     "product.apps.ProductConfig",
+    "order.apps.OrderConfig",
     "payment.apps.PaymentConfig",
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",

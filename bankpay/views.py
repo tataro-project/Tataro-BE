@@ -9,7 +9,8 @@ from rest_framework.views import APIView
 
 from bankpay.models import BankTransfer
 from bankpay.serializer import AdminAccountSerializer, BankTransferRequestSerializer
-from payment.models import Orders, Payments
+from order.models import Order
+from payment.models import Payment
 from product.models import Product
 
 
@@ -27,13 +28,13 @@ class BankTransferView(APIView):
         req_serial = BankTransferRequestSerializer(data=request.data)
         if req_serial.is_valid(raise_exception=True):
             product = get_object_or_404(Product, id=req_serial.data.get("product_id"))
-            order = Orders.objects.create(product=product, user=request.user)
+            order = Order.objects.create(product=product, user=request.user)
             bank_transfer = BankTransfer.objects.create(  # type:ignore
                 name=req_serial.data.get("name"),
                 deadline=timezone.now() + timedelta(hours=self.PAYMENT_DEADLINE_HOURS),
                 status="pending",
             )
-            payments = Payments.objects.create(
+            payments = Payment.objects.create(
                 user=request.user,
                 bank_transfer=bank_transfer,
                 order=order,

@@ -1,14 +1,21 @@
 import os
+import uuid
 
 import environ
-import portone_server_sdk as portone
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
+from drf_yasg.utils import swagger_auto_schema
 from portone_server_sdk._generated.payment.client import PaymentClient
+from rest_framework import status, viewsets, permissions
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from config.settings.base import BASE_DIR
-from payment.models import Portone
+from payment.models import Payment
+from product.models import Product
+from order.serializers import OrderSerializer
 
 env = environ.Env(DEBUG=(bool, False))  # DEBUG 기본값은 False
 
@@ -36,8 +43,8 @@ class VerifyPaymentView(View):
 
             # DB에서 해당 결제 조회
             try:
-                payment = Portone.objects.get(imp_uid=imp_uid)
-            except Portone.DoesNotExist:
+                payment = Payment.objects.get(imp_uid=imp_uid)
+            except Payment.DoesNotExist:
                 return JsonResponse({"error": "DB에서 결제 정보를 찾을 수 없습니다."}, status=400)
 
             # 결제 금액 검증
@@ -66,8 +73,8 @@ class PaymentWebhookView(View):
         try:
             # DB에서 결제 정보 조회
             try:
-                payment = Portone.objects.get(imp_uid=imp_uid)
-            except Portone.DoesNotExist:
+                payment = Payment.objects.get(imp_uid=imp_uid)
+            except Payment.DoesNotExist:
                 return JsonResponse({"error": "결제 정보를 찾을 수 없습니다."}, status=400)
 
             # 결제 상태 업데이트
@@ -93,13 +100,13 @@ class CreatePaymentView(View):
             return JsonResponse({"error": "주문번호와 결제 금액이 필요합니다."}, status=400)
 
         # DB에 결제 정보 저장
-        payment = Portone.objects.create(
+        payment = Payment.objects.create(
             merchant_uid=merchant_uid,
             amount=int(amount),
             buyer_email=buyer_email,
             buyer_name=buyer_name,
             buyer_tel=buyer_tel,
-            status=Portone.StatusChoices.PENDING
+            status="pending",
         )
 
         return JsonResponse({"message": "결제 요청 생성 완료", "payment_id": payment.id})
