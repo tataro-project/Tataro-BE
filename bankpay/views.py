@@ -73,7 +73,12 @@ class BankTransferView(APIView):
     def get(self, request):
         page = int(self.request.query_params.get("page", 1))
         size = int(self.request.query_params.get("size", 1))
-        queryset = BankPayments.objects.prefetch_related("bank_transfer").all().order_by("-created_at")
+        queryset = (
+            BankPayments.objects.prefetch_related("bank_transfer")
+            .prefetch_related("order__product")
+            .all()
+            .order_by("-created_at")
+        )
 
         # 캐시 키 생성
         cache_key = f"pay_log_count_{request.user.id}"
@@ -91,6 +96,7 @@ class BankTransferView(APIView):
         result_list = []
         for bank_log in paginated_queryset:
             data = {
+                "product_id": bank_log.order.product.id,
                 "payments_id": bank_log.id,
                 "purchase_date": bank_log.created_at,
                 "payment_amount": bank_log.amount,
