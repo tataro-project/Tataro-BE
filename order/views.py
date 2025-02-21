@@ -1,3 +1,5 @@
+import uuid
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -19,7 +21,8 @@ class OrderViewSet(viewsets.ModelViewSet[Order]):
     @swagger_auto_schema(request_body=OrderSerializer)
     def perform_create(self, serializer):  # type: ignore
         # 주문 생성 시 현재 로그인한 사용자 정보 추가
-        serializer.save(user=self.request.user)
+        order_id = f"order_{str(uuid.uuid4().hex)}"
+        serializer.save(user=self.request.user, order_id=order_id)
 
     @swagger_auto_schema(responses={204: "No Content", 400: "Bad Request"})
     def destroy(self, request, *args, **kwargs):  # type: ignore

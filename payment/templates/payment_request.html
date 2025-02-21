@@ -11,7 +11,29 @@
     <button onclick="requestPayment()">결제하기</button>
 
     <script>
-        async function requestPayment() {
+
+        async function fetchOrderData() {
+            try {
+                const response = await fetch("/api/v1/order/5/", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQwMTU2NDgxLCJpYXQiOjE3NDAxNTI4ODEsImp0aSI6ImU2NTA3MzE3MDQ5MDQ4YmZhNmNmYzcwZWFjM2RlMmY3IiwidXNlcl9pZCI6MX0.CwjyLDFlNU4vfw6JoVk0f-NHZPBIB-nQq0VHKsxuBRo",
+                    }
+                });
+                const orderData = await response.json();
+
+                console.log("주문 데이터:", orderData);
+
+                // 주문 정보를 이용하여 결제 요청
+                requestPayment(orderData);
+                
+            } catch (error) {
+                console.error("주문 정보 가져오기 실패:", error);
+            }
+        }
+
+        async function requestPayment(orderData) {
             try {
                 const response = await PortOne.requestPayment({
                     storeId: "store-6b0125e5-0342-4320-ad7d-00aa3f822cd4", // 가맹점 식별 코드
@@ -20,9 +42,9 @@
                     pg: "nice", // PG사 (나이스페이먼츠)
                     payMethod: "CARD", // 결제 방식 (카드)
                     channelKey: "channel-key-813a22b5-1a0a-4c15-baca-9f8a88940cf2",
-                    orderId: "order_" + new Date().getTime(), // 주문번호 (고유값)
-                    orderName: "테스트 결제 상품", // 상품명
-                    totalAmount: 10000, // 결제 금액 (원)
+                    orderId: orderData.orderId, // 주문번호 (고유값)
+                    orderName: orderData.product., // 상품명
+                    totalAmount: orderData.totalAmount, // 결제 금액 (원)
                     customer: {
                         email: "test@example.com", // 구매자 이메일
                         name: "홍길동", // 구매자 이름
@@ -38,6 +60,9 @@
                 alert("결제 중 오류가 발생했습니다.");
             }
         }
+
+        // 페이지 로드 후 주문 데이터 가져오기
+        window.onload = fetchOrderData;
     </script>
 </body>
 </html>
