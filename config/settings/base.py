@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "user.apps.UserConfig",
     "tarot.apps.TarotConfig",
     "helpers.apps.HelpersConfig",
+    "bankpay.apps.BankpayConfig",
     # third_apps
     "rest_framework",
     "drf_yasg",
@@ -139,11 +140,11 @@ AUTH_USER_MODEL = "user.User"
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -188,3 +189,5 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
 }
+
+CSRF_TRUSTED_ORIGINS = ["https://hakunamatatarot.com"]

@@ -1,6 +1,7 @@
 from typing import cast
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -34,7 +35,12 @@ from .serializers import ReviewSerializer
 @permission_classes([IsAuthenticated])
 def review_list_or_create(request: Request) -> Response:  # type: ignore
     if request.method == "GET":
-        reviews = Review.objects.all().order_by("-created_at")
+        sort_by = request.query_params.get("sort_by", "views")  # 기본값은 views(인기순)
+
+        if sort_by == "date":
+            reviews = Review.objects.select_related("user").order_by("created_at")
+        else:
+            reviews = Review.objects.select_related("user").order_by("-view_count")
         paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
         paginated_reviews = paginator.paginate_queryset(reviews, request)  # 페이지네이션 적용
         serializer = ReviewSerializer(paginated_reviews, many=True)
@@ -77,7 +83,7 @@ def review_list_or_create(request: Request) -> Response:  # type: ignore
 @api_view(["GET", "PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
 def review_detail_update_delete(request: Request, review_id: int) -> Response:  # type: ignore
-    review = get_object_or_404(Review, id=review_id)
+    review = get_object_or_404(Review.objects.select_related("user"), id=review_id)
 
     if request.method == "GET":
         review.increase_view_count()
