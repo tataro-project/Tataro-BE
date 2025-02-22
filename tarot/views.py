@@ -272,6 +272,47 @@ class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
             return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(  # type:ignore
+        operation_summary="해당 id 채팅 로그",
+        operation_description="주어진 room_id에 해당하는 로그를 응답합니다",
+        request_body=no_body,
+        responses={200: TaroChatRoomResponseSerializer},
+    )
+    def get_id_log(self, request: Request, *args: list[Any], **kwargs: dict[str, Any]) -> Response | None:
+        current_chat_room = self.get_object()
+        contents_list = current_chat_room.contents_list
+        chat_log_list = []
+        card_list = TaroCardContents.objects.filter(room_id=current_chat_room.id).order_by("created_at")
+        # question,answer 쌍으로 데이터가 필요함으로 idx 2씩 증가
+        for idx in range(0, len(contents_list) - 1, 2):
+            question = contents_list[idx].content
+            answer = contents_list[idx + 1].content
+            # 나중에 함수화 시키기
+            card = card_list[idx // 2]
+            chat_log = TaroChatLogSerializer(
+                data={
+                    "question": question,
+                    "content": answer,
+                    "card_name": card.card_name,
+                    "card_url": tarot_cards[card.card_name],
+                    "card_content": card.card_content,
+                    "card_direction": card.card_direction,
+                }
+            )
+            if chat_log.is_valid(raise_exception=True):
+                chat_log_list.append(chat_log.data)
+
+        serializer = self.get_serializer(
+            data={
+                "room_id": current_chat_room.id,
+                "created_at": current_chat_room.created_at,
+                "updated_at": current_chat_room.updated_at,
+                "chat_log": chat_log_list,
+            }
+        )
+        if serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(  # type:ignore
         operation_summary="모든 채팅 로그 페이지네이션",
         operation_description="모든 채팅 로그를 페이지네이션을 통해 해당 페이지의 로그 내역을 응답합니다.",
         manual_parameters=[
