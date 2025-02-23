@@ -49,12 +49,14 @@ def review_list_or_create(request: Request) -> Response:  # type: ignore
     elif request.method == "POST":
         data = request.data.copy()
         file = request.FILES.get("image")  # 프론트에서 "image" 필드로 파일을 전송해야 함
+        print(file)
         cate = "review"
         if file and isinstance(file, InMemoryUploadedFile):
+            print(file)
             img_url = upload_to_ncp(cate, file)  # 네이버 클라우드에 업로드 후 URL 반환
             data["img_url"] = img_url
-
-        serializer = ReviewSerializer(data=request.data)
+            print(img_url)
+        serializer = ReviewSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=cast(User, request.user))
             return Response(serializer.data, status=status.HTTP_201_CREATED)
