@@ -89,7 +89,9 @@ class TarotAfterInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
 class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
     # 필요한 참조 테이블 미리 가져오기
     queryset = TaroChatRooms.objects.prefetch_related(
-        Prefetch("tarochatcontents_set", to_attr="contents_list")
+        Prefetch(
+            "tarochatcontents_set", queryset=TaroChatContents.objects.order_by("created_at"), to_attr="contents_list"
+        )
     ).all()  # path parameter default pk임
     serializer_class = TaroChatRoomResponseSerializer
 
@@ -174,7 +176,9 @@ class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
 class TarotLogViewSet(viewsets.GenericViewSet):  # type: ignore
     # 필요한 참조 테이블 미리 가져오기
     queryset = TaroChatRooms.objects.prefetch_related(
-        Prefetch("tarochatcontents_set", to_attr="contents_list")
+        Prefetch(
+            "tarochatcontents_set", queryset=TaroChatContents.objects.order_by("created_at"), to_attr="contents_list"
+        )
     ).all()  # path parameter default pk임
     serializer_class = TaroChatRoomResponseSerializer
 
