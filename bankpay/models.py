@@ -15,7 +15,7 @@ class BankTransfer(BaseModel):
         ("mismatch", "mismatch"),
     )
     name = models.CharField(max_length=10)
-    deadline = models.DateField()
+    deadline = models.DateTimeField()
     status = models.CharField(choices=STATUS_CHOICES)
 
 

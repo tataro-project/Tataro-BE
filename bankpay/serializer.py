@@ -13,6 +13,9 @@ class BankTransferRequestSerializer(serializers.Serializer):  # type:ignore
 
 class AdminAccountSerializer(serializers.Serializer):  # type:ignore
     admin_account = serializers.CharField(help_text="관리자 계좌번호", max_length=30)
+    admin_name = serializers.CharField(help_text="관리자 성명")
+    admin_bank = serializers.CharField(help_text="관리자 계좌의 은행")
+    deadline = serializers.DateTimeField()
     payments_id = serializers.IntegerField()
 
 

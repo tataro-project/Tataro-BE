@@ -21,7 +21,9 @@ from product.models import Product
 
 class BankTransferView(APIView):
     PAYMENT_DEADLINE_HOURS = 24
+    ADMIN_NAME = "홍길동"
     ADMIN_ACCOUNT = "000000-0000000-0000000"
+    ADMIN_BANK = "농협은행"
 
     @swagger_auto_schema(  # type:ignore
         operation_summary="무통장 결제",
@@ -51,7 +53,13 @@ class BankTransferView(APIView):
             total_count = BankPayments.objects.count()
             cache.set(f"pay_log_count_{request.user.id}", total_count)
 
-            data = {"admin_account": self.ADMIN_ACCOUNT, "payments_id": payments.id}
+            data = {
+                "admin_account": self.ADMIN_ACCOUNT,
+                "admin_name": self.ADMIN_NAME,
+                "admin_bank": self.ADMIN_BANK,
+                "deadline": bank_transfer.deadline,
+                "payments_id": payments.id,
+            }
             res_serializer = AdminAccountSerializer(data=data)
             res_serializer.is_valid(raise_exception=True)
             return Response(res_serializer.data, status=status.HTTP_201_CREATED)
@@ -76,7 +84,7 @@ class BankTransferView(APIView):
         queryset = (
             BankPayments.objects.prefetch_related("bank_transfer")
             .prefetch_related("order__product")
-            .all()
+            .filter(user=request.user)
             .order_by("-created_at")
         )
 
