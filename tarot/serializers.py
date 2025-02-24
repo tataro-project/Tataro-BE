@@ -46,7 +46,7 @@ class TaroChatRoomResponseSerializer(serializers.Serializer["TaroChatLogSerializ
     updated_at = serializers.DateTimeField()
     review_id = serializers.IntegerField(required=False, allow_null=True)
     chat_log = TaroChatLogSerializer(many=True)
-    user_id = serializers.IntegerField() # 영현 추가
+    user_id = serializers.IntegerField()  # 영현 추가
 
 
 class TaroChatAllRoomResponseSerializer(serializers.Serializer["TaroChatRoomResponseSerializer"]):
@@ -55,4 +55,4 @@ class TaroChatAllRoomResponseSerializer(serializers.Serializer["TaroChatRoomResp
     total_count = serializers.IntegerField()
     total_pages = serializers.IntegerField()
     chat_contents = TaroChatRoomResponseSerializer(many=True)
-    user_id = serializers.IntegerField() # 영현 추가
+    user_id = serializers.IntegerField()  # 영현 추가
