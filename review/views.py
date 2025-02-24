@@ -1,12 +1,11 @@
 from typing import cast
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.db.models import F
 from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -32,33 +31,36 @@ from .serializers import ReviewSerializer
     responses={201: ReviewSerializer, 400: "잘못된 요청"},
 )
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def review_list_or_create(request: Request) -> Response:  # type: ignore
     if request.method == "GET":
-        sort_by = request.query_params.get("sort_by", "views")  # 기본값은 views(인기순)
+        sort_by = request.query_params.get("sort_by", "views")
 
         if sort_by == "date":
             reviews = Review.objects.select_related("user").order_by("-created_at")
         else:
             reviews = Review.objects.select_related("user").order_by("-view_count")
-        paginator = CustomPageNumberPagination()  # 커스텀 페이지네이터 사용
-        paginated_reviews = paginator.paginate_queryset(reviews, request)  # 페이지네이션 적용
+
+        paginator = CustomPageNumberPagination()
+        paginated_reviews = paginator.paginate_queryset(reviews, request)
         serializer = ReviewSerializer(paginated_reviews, many=True)
-        return paginator.get_paginated_response(serializer.data)  # 커스텀 응답 반환
+        return paginator.get_paginated_response(serializer.data)
 
     elif request.method == "POST":
+        if not request.user.is_authenticated:  # 인증된 사용자만 생성 가능
+            return Response({"error": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED)
+
         data = request.data.copy()
-        file = request.FILES.get("image")  # 프론트에서 "image" 필드로 파일을 전송해야 함
-        print(file)
+        file = request.FILES.get("image")
         cate = "review"
+
         if file and isinstance(file, InMemoryUploadedFile):
-            print(file)
-            img_url = upload_to_ncp(cate, file)  # 네이버 클라우드에 업로드 후 URL 반환
+            img_url = upload_to_ncp(cate, file)
             data["img_url"] = img_url
-            print(img_url)
+
         serializer = ReviewSerializer(data=data)
         if serializer.is_valid():
-            serializer.save(user=cast(User, request.user))
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -83,7 +85,7 @@ def review_list_or_create(request: Request) -> Response:  # type: ignore
     responses={204: "삭제됨", 403: "권한 없음", 404: "리뷰를 찾을 수 없음"},
 )
 @api_view(["GET", "PUT", "DELETE"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def review_detail_update_delete(request: Request, review_id: int) -> Response:  # type: ignore
     review = get_object_or_404(Review.objects.select_related("user"), id=review_id)
 
@@ -91,28 +93,29 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
         review.increase_view_count()
         serializer = ReviewSerializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    elif request.method == "PUT":
-        if cast(User, request.user) != review.user:
-            return Response({"error": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
-        serializer = ReviewSerializer(review, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == "DELETE":
 
-        if cast(User, request.user) != review.user:
-            return Response({"error": "삭제 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+    elif request.method in ["PUT", "DELETE"]:
+        if not request.user.is_authenticated:
+            return Response({"error": "로그인이 필요합니다."}, status=status.HTTP_401_UNAUTHORIZED)
 
-        # 리뷰에 이미지 URL이 있는 경우 NCP에서 삭제
-        if review.img_url:  # 이미지 URL 필드가 있다고 가정
-            try:
-                delete_from_ncp(review.img_url)
-            except Exception as e:
-                return Response(
-                    {"error": f"이미지 삭제 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+        if request.user != review.user:
+            return Response({"error": "권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
-        # 리뷰 삭제
-        review.delete()
-        return Response({"message": "리뷰가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
+        if request.method == "PUT":
+            serializer = ReviewSerializer(review, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        elif request.method == "DELETE":
+            if review.img_url:
+                try:
+                    delete_from_ncp(review.img_url)
+                except Exception as e:
+                    return Response(
+                        {"error": f"이미지 삭제 중 오류 발생: {e}"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    )
+            review.delete()
+            return Response({"message": "리뷰가 삭제되었습니다."}, status=status.HTTP_204_NO_CONTENT)
