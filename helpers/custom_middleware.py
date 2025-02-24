@@ -9,6 +9,7 @@ from django.contrib.auth.models import AnonymousUser
 
 logger = logging.getLogger(__name__)
 
+
 class TokenAuthMiddleware(BaseMiddleware):  # type: ignore
     def __init__(self, inner):  # type: ignore
         super().__init__(inner)
@@ -23,7 +24,7 @@ class TokenAuthMiddleware(BaseMiddleware):  # type: ignore
             scope["user"] = AnonymousUser()
         return await super().__call__(scope, receive, send)
 
-    def get_token_from_scope(self, scope):
+    def get_token_from_scope(self, scope):  # type: ignore
         # 기존 방식 (헤더에서 토큰 추출)
         headers = dict(scope["headers"])
         auth_header = headers.get(b"authorization", b"").decode()
