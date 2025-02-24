@@ -5,10 +5,12 @@ from .models import Review
 
 class ReviewSerializer(serializers.ModelSerializer[Review]):
     user_nickname = serializers.CharField(source="user.nickname", read_only=True)
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
 
     class Meta:
         model = Review
         fields = [
+            "user_id",
             "id",
             "title",
             "content",
@@ -20,4 +22,4 @@ class ReviewSerializer(serializers.ModelSerializer[Review]):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["user_nickname"]
+        read_only_fields = ["user_nickname", "user_id"]
