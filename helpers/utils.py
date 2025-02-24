@@ -16,11 +16,7 @@ def upload_to_ncp(cate: str, file):  # type: ignore
     file_extension = file.name.split(".")[-1]
     file_name = f"{cate}/{uuid.uuid4()}.{file_extension}"  # 고유한 파일명 생성
 
-    s3_client.upload_fileobj(
-        file,
-        ncp_config["BUCKET_NAME"],
-        file_name,
-    )
+    s3_client.upload_fileobj(file, ncp_config["BUCKET_NAME"], file_name, ExtraArgs={"ACL": "public-read"})
 
     return f"{ncp_config['ENDPOINT_URL']}/{ncp_config['BUCKET_NAME']}/{file_name}"
 
