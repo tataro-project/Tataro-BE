@@ -18,13 +18,13 @@ from bankpay.serializer import (
 )
 from product.models import Product
 
+PAYMENT_DEADLINE_HOURS = 24
+ADMIN_NAME = "홍길동"
+ADMIN_ACCOUNT = "000000-0000000-0000000"
+ADMIN_BANK = "농협은행"
+
 
 class BankTransferView(APIView):
-    PAYMENT_DEADLINE_HOURS = 24
-    ADMIN_NAME = "홍길동"
-    ADMIN_ACCOUNT = "000000-0000000-0000000"
-    ADMIN_BANK = "농협은행"
-
     @swagger_auto_schema(  # type:ignore
         operation_summary="무통장 결제",
         operation_description="무통장 결제를 생성합니다.",
@@ -38,7 +38,7 @@ class BankTransferView(APIView):
             order = BankOrders.objects.create(product=product, user=request.user)
             bank_transfer = BankTransfer.objects.create(  # type:ignore
                 name=req_serial.data.get("name"),
-                deadline=timezone.now() + timedelta(hours=self.PAYMENT_DEADLINE_HOURS),
+                deadline=timezone.now() + timedelta(hours=PAYMENT_DEADLINE_HOURS),
                 status="pending",
             )
             payments = BankPayments.objects.create(
@@ -54,9 +54,9 @@ class BankTransferView(APIView):
             cache.set(f"pay_log_count_{request.user.id}", total_count)
 
             data = {
-                "admin_account": self.ADMIN_ACCOUNT,
-                "admin_name": self.ADMIN_NAME,
-                "admin_bank": self.ADMIN_BANK,
+                "admin_account": ADMIN_ACCOUNT,
+                "admin_name": ADMIN_NAME,
+                "admin_bank": ADMIN_BANK,
                 "deadline": bank_transfer.deadline,
                 "payments_id": payments.id,
             }
@@ -124,3 +124,24 @@ class BankTransferView(APIView):
         )
         response_serializer.is_valid(raise_exception=True)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
+
+
+class BankTransferIdView(APIView):
+    @swagger_auto_schema(  # type:ignore
+        operation_summary="무통장 결제 상세정보",
+        operation_description="관리자 계좌 정보와 입금 기한을 응답합니다.",
+        request_body=no_body,
+        responses={201: AdminAccountSerializer},
+    )
+    def get(self, request, payment_id):
+        bank_transfer = get_object_or_404(BankTransfer, pk=payment_id)
+        data = {
+            "admin_account": ADMIN_ACCOUNT,
+            "admin_name": ADMIN_NAME,
+            "admin_bank": ADMIN_BANK,
+            "deadline": bank_transfer.deadline,
+            "payments_id": payment_id,
+        }
+        res_serializer = AdminAccountSerializer(data=data)
+        res_serializer.is_valid(raise_exception=True)
+        return Response(res_serializer.data, status=status.HTTP_201_CREATED)

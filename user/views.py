@@ -1,4 +1,7 @@
-from drf_yasg.utils import swagger_auto_schema
+from django.db import transaction
+from django.db.models.expressions import F
+from django.http.response import JsonResponse
+from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -6,7 +9,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import UserUpdateSerializer
+from .serializers import (
+    ErrorResponseSerializer,
+    UserHeartUpdateSerializer,
+    UserUpdateSerializer,
+)
 
 
 # 사용자 정보 조회 및 수정을 처리하는 API View
@@ -85,3 +92,35 @@ class UserView(APIView):
             return Response(
                 {"message": f"회원 탈퇴 중 오류가 발생했습니다: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class UserHeartView(APIView):
+    @swagger_auto_schema(
+        operation_summary="유저 재화 수정",
+        operation_description='유저의 "heart_count"를 수정하여 재화를 소모합니다.',
+        request_body=no_body,
+        responses={200: UserHeartUpdateSerializer, 400: ErrorResponseSerializer},
+    )
+    # 사용자 정보 수정을 처리하는 PUT 메서드
+    def put(self, request: Request) -> Response | JsonResponse:
+        with transaction.atomic():
+            # 유저 가져오기 (락을 걸기 위해 select_for_update 사용)
+            user = User.objects.select_for_update().get(id=request.user.id)
+
+            # 현재 재화 확인
+            current_heart_count = user.heart_count  # 재화 필드가 'currency'라고 가정
+
+            # 재화 부족 체크
+            if current_heart_count < 10:  # amount를 10으로 가정했는데, 동적으로 받음
+                error_data = {"error": "하트가 부족합니다.", "current_heart_count": current_heart_count}
+                return Response(ErrorResponseSerializer(error_data).data, status=400)
+
+            # F()를 사용해 데이터베이스 수준에서 안전하게 감소
+            user.heart_count = F("heart_count") - 10
+            user.save()
+
+            # F()를 사용하므로 업데이트 후 최신 값 확인을 위해 객체 새로고침
+            user.refresh_from_db()
+            serializer = UserHeartUpdateSerializer(user)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)

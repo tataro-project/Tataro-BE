@@ -147,8 +147,6 @@ class KakaoReissueView(APIView):
                     type=openapi.TYPE_OBJECT,
                     properties={
                         "access_token": openapi.Schema(type=openapi.TYPE_STRING, description="새로운 액세스 토큰"),
-                        "token_type": openapi.Schema(type=openapi.TYPE_STRING),
-                        "expires_in": openapi.Schema(type=openapi.TYPE_INTEGER),
                     },
                 ),
             ),
@@ -161,35 +159,39 @@ class KakaoReissueView(APIView):
         if not refresh_token:
             return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 카카오 토큰 갱신 API 엔드포인트
-        url = "https://kauth.kakao.com/oauth/token"
-        # 요청 데이터 설정
-        data = {
-            "grant_type": "refresh_token",
-            "client_id": env("KAKAO_REST_API_KEY"),
-            "refresh_token": refresh_token,
-            "client_secret": env("KAKAO_CLIENT_SECRET"),
-        }
+        refresh_token = RefreshToken(refresh_token)
+        # 응답 처리
+        return Response({"access_token": str(refresh_token.access_token)}, status=status.HTTP_200_OK)
 
-        # 헤더 설정
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
-
-        # 카카오 API에 POST 요청 보내기
-        response = requests.post(url, data=data, headers=headers)
+        # # 카카오 토큰 갱신 API 엔드포인트
+        # url = "https://kauth.kakao.com/oauth/token"
+        # # 요청 데이터 설정
+        # data = {
+        #     "grant_type": "refresh_token",
+        #     "client_id": env("KAKAO_REST_API_KEY"),
+        #     "refresh_token": refresh_token,
+        #     "client_secret": env("KAKAO_CLIENT_SECRET"),
+        # }
+        #
+        # # 헤더 설정
+        # headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        #
+        # # 카카오 API에 POST 요청 보내기
+        # response = requests.post(url, data=data, headers=headers)
 
         # 응답 처리
-        if response.status_code == 200:
-            new_tokens = response.json()
-            return Response(new_tokens, status=status.HTTP_200_OK)
-        elif response.status_code == 400 and "invalid_grant" in response.text:
-            # 리프레시 토큰이 만료된 경우
-            return Response(
-                {"error": "Refresh token expired", "message": "Please log in again"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        else:
-            logger.error(f"Failed to refresh token. Status: {response.status_code}, Response: {response.text}")
-            return Response(
-                {"error": "Failed to refresh token", "details": response.text},
-                status=response.status_code,
-            )
+        # if response.status_code == 200:
+        #     new_tokens = response.json()
+        #     return Response(new_tokens, status=status.HTTP_200_OK)
+        # elif response.status_code == 400 and "invalid_grant" in response.text:
+        #     # 리프레시 토큰이 만료된 경우
+        #     return Response(
+        #         {"error": "Refresh token expired", "message": "Please log in again"},
+        #         status=status.HTTP_401_UNAUTHORIZED,
+        #     )
+        # else:
+        #     logger.error(f"Failed to refresh token. Status: {response.status_code}, Response: {response.text}")
+        #     return Response(
+        #         {"error": "Failed to refresh token", "details": response.text},
+        #         status=response.status_code,
+        #     )

@@ -17,6 +17,7 @@ class User(AbstractUser):
     social_type = models.CharField(max_length=10, choices=SOCIAL_CHOICES)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True)
     birth = models.DateTimeField(null=True)
+    heart_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
