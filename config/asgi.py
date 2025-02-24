@@ -11,8 +11,8 @@ import os
 
 import django
 from channels.routing import ProtocolTypeRouter, URLRouter
-from django.core.asgi import get_asgi_application
 from channels.security.websocket import AllowedHostsOriginValidator
+from django.core.asgi import get_asgi_application
 
 environment = os.getenv("DJANGO_ENV", "dev")  # 기본값은 dev
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{environment}")
