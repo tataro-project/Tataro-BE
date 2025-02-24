@@ -191,4 +191,3 @@ SIMPLE_JWT = {
 }
 
 CSRF_TRUSTED_ORIGINS = ["https://hakunamatatarot.com"]
-
