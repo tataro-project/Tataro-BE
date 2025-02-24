@@ -16,6 +16,9 @@ class TimeStampedModel(models.Model):
 class TaroChatRooms(TimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ["created_at"]
+
 
 class TaroCardContents(TimeStampedModel):
     direction = (("upright", "upright"), ("reversed", "reversed"))
@@ -23,6 +26,9 @@ class TaroCardContents(TimeStampedModel):
     card_name = models.CharField()
     card_direction = models.CharField(choices=direction)
     card_content = models.TextField()
+
+    class Meta:
+        ordering = ["created_at"]
 
     @classmethod
     def generate_tarot_prompt(cls, content: str) -> str:
@@ -59,6 +65,9 @@ class TaroCardContents(TimeStampedModel):
 class TaroChatContents(TimeStampedModel):
     room = models.ForeignKey(TaroChatRooms, on_delete=models.CASCADE)
     content = models.TextField()
+
+    class Meta:
+        ordering = ["created_at"]
 
     @classmethod
     def init_tarot_prompt(cls, content: str) -> str:

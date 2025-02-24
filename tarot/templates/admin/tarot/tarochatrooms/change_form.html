@@ -1,0 +1,92 @@
+{% extends "admin/change_form.html" %}
+{% load custom_filters %}
+
+{% block content %}
+    {{ block.super }}
+
+    <style>
+        /* Wrapper to contain and position the chat content */
+        .chat-wrapper {
+            margin-top: 120px; /* 상단 마진을 크게 늘려 "SAVE" 바와 겹침 완전히 방지 */
+            padding-top: 20px; /* 추가적인 패딩 유지 */
+        }
+
+        .chat-container {
+            max-width: 400px; /* 폭을 이전처럼 600px로 좁힘 */
+            margin: 0 auto; /* 중앙 정렬 유지 */
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            position: relative; /* 적절한 스택킹 보장 */
+            z-index: 10; /* 더 높은 z-index로 다른 요소 위에 표시 */
+        }
+
+        .message {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            width: 45%; /* 메시지 폭을 좁게 유지, 이미지와 유사하게 */
+        }
+
+        .user1 {
+            background-color: #e0e0e0; /* 한 사용자를 위한 밝은 회색 */
+            align-self: flex-end; /* 오른쪽 정렬 */
+            margin-left: auto; /* 오른쪽으로 밀기 */
+        }
+
+        .user2 {
+            background-color: #f0f0f0; /* 다른 사용자를 위한 약간 더 밝은 회색 */
+            align-self: flex-start; /* 왼쪽 정렬 */
+        }
+
+        .card-section {
+            background-color: #f9f9f9; /* 카드 섹션 배경 밝은 회색 */
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center; /* 카드 콘텐츠 중앙 정렬 */
+        }
+
+        .card-section h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .card-section p {
+            margin: 0;
+            line-height: 1.5;
+        }
+    </style>
+
+    {% if original %}
+        <div class="chat-wrapper">
+            <div class="chat-container">
+                {% with chats=original.tarochatcontents_set.all cards=original.tarocardcontents_set.all %}
+                    {% for card in cards %}
+                        {% with group_index=forloop.counter0 %}
+                            {% with index1=group_index|multiply:2 index2=group_index|multiply:2|add:1 %}
+                                {% with chat1=chats|index:index1 chat2=chats|index:index2 %}
+                                    {% if chat1 and chat2 %}
+                                        <div class="message user1">
+                                            {{ chat1.content }}
+                                        </div>
+                                        <div class="message user2">
+                                            {{ chat2.content }}
+                                        </div>
+                                        <div class="card-section">
+                                            <h3>{{ card.card_name }} ({{ card.card_direction }})</h3>
+                                            <p>{{ card.card_content }}</p>
+                                        </div>
+                                    {% else %}
+                                        <p>데이터가 부족합니다 (인덱스 {{ group_index }}).</p>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+        </div>
+    {% else %}
+        <p>객체를 찾을 수 없습니다.</p>
+    {% endif %}
+{% endblock %}
