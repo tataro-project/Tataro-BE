@@ -10,9 +10,7 @@ class Notification(BaseModel):
     content = models.TextField()  # content 를 title에 연결할 link 주소로 사용함.
     is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="notifications"
-    )
+    category = models.CharField(max_length=20)
 
 
 class NotiUser(BaseModel):

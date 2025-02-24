@@ -6,7 +6,7 @@ from .models import Notification
 class NotificationSerializer(serializers.ModelSerializer[Notification]):
     class Meta:
         model = Notification
-        fields = ["id", "title", "content", "user", "created_at", "updated_at"]
+        fields = ["id", "title", "content", "user", "created_at", "updated_at", "category"]
         read_only_fields = ["id", "user", "created_at", "updated_at"]
 
     # 자동으로 생성된다고 함
