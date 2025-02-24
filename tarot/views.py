@@ -167,6 +167,7 @@ class TarotGenerateViewSet(viewsets.GenericViewSet):  # type: ignore
                 "created_at": chat_room.created_at,
                 "updated_at": chat_room.updated_at,
                 "chat_log": chat_log_list,
+                "user_id": chat_room.user.id,  # 영현 추가
             }
         )
         if serializer.is_valid(raise_exception=True):
