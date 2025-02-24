@@ -128,8 +128,6 @@ class NaverReissueView(APIView):
                     type=openapi.TYPE_OBJECT,
                     properties={
                         "access_token": openapi.Schema(type=openapi.TYPE_STRING, description="새로운 액세스 토큰"),
-                        "token_type": openapi.Schema(type=openapi.TYPE_STRING),
-                        "expires_in": openapi.Schema(type=openapi.TYPE_INTEGER),
                     },
                 ),
             ),
@@ -142,31 +140,41 @@ class NaverReissueView(APIView):
         if not refresh_token:
             return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # 네이버 토큰 갱신 API 엔드포인트
-        url = "https://nid.naver.com/oauth2.0/token"
-
-        # 요청 데이터 설정
-        data = {
-            "grant_type": "refresh_token",
-            "client_id": env("NAVER_CLIENT_ID"),
-            "client_secret": env("NAVER_CLIENT_SECRET"),
-            "refresh_token": refresh_token,
-        }
-
-        # 네이버 API에 POST 요청 보내기
-        response = requests.post(url, data=data)
-        response_data = response.json()
-
+        refresh_token = RefreshToken(refresh_token)
         # 응답 처리
-        if "error" in response_data:
-            error_message = response_data.get("error_description", "Unknown error")
-            return Response(
-                {"error": response_data["error"], "error_description": error_message},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        return Response({"access_token": str(refresh_token.access_token)}, status=status.HTTP_200_OK)
 
-        if "access_token" in response_data:
-            return Response(response_data, status=status.HTTP_200_OK)
-
-        logger.error(f"Unexpected response. Status: {response.status_code}, Response: {response.text}")
-        return Response({"error": "Unexpected response from Naver API"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    # def post(self, request: Request) -> Response:
+    #     # 클라이언트로부터 refresh 토큰을 받아옴
+    #     refresh_token = request.data.get("refresh_token")
+    #     if not refresh_token:
+    #         return Response({"error": "Refresh token is required"}, status=status.HTTP_400_BAD_REQUEST)
+    #
+    #     # 네이버 토큰 갱신 API 엔드포인트
+    #     url = "https://nid.naver.com/oauth2.0/token"
+    #
+    #     # 요청 데이터 설정
+    #     data = {
+    #         "grant_type": "refresh_token",
+    #         "client_id": env("NAVER_CLIENT_ID"),
+    #         "client_secret": env("NAVER_CLIENT_SECRET"),
+    #         "refresh_token": refresh_token,
+    #     }
+    #
+    #     # 네이버 API에 POST 요청 보내기
+    #     response = requests.post(url, data=data)
+    #     response_data = response.json()
+    #
+    #     # 응답 처리
+    #     if "error" in response_data:
+    #         error_message = response_data.get("error_description", "Unknown error")
+    #         return Response(
+    #             {"error": response_data["error"], "error_description": error_message},
+    #             status=status.HTTP_400_BAD_REQUEST,
+    #         )
+    #
+    #     if "access_token" in response_data:
+    #         return Response(response_data, status=status.HTTP_200_OK)
+    #
+    #     logger.error(f"Unexpected response. Status: {response.status_code}, Response: {response.text}")
+    #     return Response({"error": "Unexpected response from Naver API"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
