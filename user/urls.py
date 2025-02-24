@@ -3,10 +3,11 @@ from django.urls import path
 from .auth.kakao import KakaoCallbackView, KakaoLoginView, KakaoReissueView
 from .auth.naver import NaverCallbackView, NaverLoginView, NaverReissueView
 from .auth.views import LogoutView
-from .views import UserView
+from .views import UserHeartView, UserView
 
 urlpatterns = [
     path("user/", UserView.as_view()),
+    path("user/heart/", UserHeartView.as_view()),
     path("user/auth/logout/", LogoutView.as_view()),
     path("user/auth/kakao/", KakaoLoginView.as_view(), name="kakao-login"),
     path("user/auth/kakao/callback/", KakaoCallbackView.as_view(), name="kakao-callback"),

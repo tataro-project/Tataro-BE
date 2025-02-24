@@ -36,3 +36,17 @@ class UserUpdateSerializer(serializers.ModelSerializer[User]):
 
         # 수정된 사용자 객체 반환
         return instance
+
+
+class UserHeartUpdateSerializer(serializers.ModelSerializer[User]):
+    class Meta:
+        # User 모델과 매핑
+        model = User
+        # 시리얼라이저에 포함할 필드들을 지정
+        fields = ["heart_count"]
+        read_only_fields = ["heart_count"]
+
+
+class ErrorResponseSerializer(serializers.Serializer):  # type:ignore
+    error = serializers.CharField()
+    current_heart_count = serializers.IntegerField(required=False)
