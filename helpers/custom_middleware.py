@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import parse_qs
 
 import jwt
 from channels.db import database_sync_to_async
@@ -25,18 +26,15 @@ class TokenAuthMiddleware(BaseMiddleware):  # type: ignore
         return await super().__call__(scope, receive, send)
 
     def get_token_from_scope(self, scope):  # type: ignore
-        # 기존 방식 (헤더에서 토큰 추출)
-        headers = dict(scope["headers"])
-        auth_header = headers.get(b"authorization", b"").decode()
+        query_string = parse_qs(scope["query_string"].decode())
 
-        if auth_header.startswith("Bearer "):
-            return auth_header.split(" ")[1]
+        # 🔹 URL 쿼리 파라미터에서 토큰 가져오기
+        token = query_string.get("token", [None])[0]
 
-        # `Sec-WebSocket-Protocol`에서 토큰 추출
-        if scope.get("subprotocols"):
-            return scope["subprotocols"][0]  # 첫 번째 프로토콜 값을 토큰으로 가정
+        if not token:
+            raise ValueError("Missing token")
 
-        raise ValueError("Invalid authorization header or missing WebSocket protocol")
+        return token
 
     @database_sync_to_async
     def get_user_from_token(self, token):  # type: ignore
