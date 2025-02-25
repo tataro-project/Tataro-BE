@@ -94,10 +94,13 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
         if cast(User, request.user) != review.user:
             return Response({"error": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
 
+        # image url 을 None 으로 만들 경우에 변경 가능한 객체 생성이 필요함... 기본적으로 django 객체는 불변하기 때문.
+        mutable_data = dict(request.data.items())
         # 이미지 파일이 요청에 포함되어 있는지 확인
         new_image = request.FILES.get("image")
         request_img_url = request.data.get("img_url", None)
 
+        # 새로운 이미지를 올린 경우.
         if new_image:
             # 기존 이미지가 있는지 확인
             if review.img_url:
@@ -113,7 +116,7 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
             try:
                 cate = "review"
                 new_img_url = upload_to_ncp(cate, new_image)
-                request.data["img_url"] = new_img_url
+                mutable_data["img_url"] = new_img_url
             except Exception as e:
                 return Response(
                     {"error": f"새 이미지 업로드 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -123,17 +126,18 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
             # 요청의 img_url이 빈 문자열이고, DB에 이미지가 있는 경우
             try:
                 delete_from_ncp(review.img_url)
-                request.data["img_url"] = None  # DB에 null 값을 저장하기 위해 None으로 설정
+                mutable_data["img_url"] = None  # DB에 null 값을 저장하기 위해 None으로 설정
             except Exception as e:
                 return Response(
                     {"error": f"이미지 삭제 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-        serializer = ReviewSerializer(review, data=request.data, partial=True)
+        serializer = ReviewSerializer(review, data=mutable_data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     elif request.method == "DELETE":
 
         if cast(User, request.user) != review.user:
