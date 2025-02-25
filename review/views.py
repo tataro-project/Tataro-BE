@@ -96,6 +96,7 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
 
         # 이미지 파일이 요청에 포함되어 있는지 확인
         new_image = request.FILES.get("image")
+        request_img_url = request.data.get("img_url", None)
 
         if new_image:
             # 기존 이미지가 있는지 확인
@@ -116,6 +117,16 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
             except Exception as e:
                 return Response(
                     {"error": f"새 이미지 업로드 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+        elif request_img_url == "" and review.img_url:
+            # 요청의 img_url이 빈 문자열이고, DB에 이미지가 있는 경우
+            try:
+                delete_from_ncp(review.img_url)
+                request.data["img_url"] = None  # DB에 null 값을 저장하기 위해 None으로 설정
+            except Exception as e:
+                return Response(
+                    {"error": f"이미지 삭제 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
         serializer = ReviewSerializer(review, data=request.data, partial=True)
