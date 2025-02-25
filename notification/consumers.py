@@ -42,7 +42,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
             }
             for noti in unread_notifications
         ]
-        await self.send(text_data=json.dumps({"notifications": notifications_data}, ensure_ascii=False))
+        await self.send(
+            text_data=json.dumps({"notifications": notifications_data}, ensure_ascii=False)
+            .encode("utf-8")
+            .decode("utf-8")
+        )
 
     # # 클라이언트가 보낸 알림을 받음.
     # async def receive(self, text_data):  # type: ignore
@@ -85,7 +89,11 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
     async def new_notification(self, event):  # type: ignore
         # 새 알림을 클라이언트에게 전송
         notification_data = event["notification"]
-        await self.send(text_data=json.dumps({"type": "new_notification", "notification": notification_data}))
+        await self.send(
+            text_data=json.dumps({"type": "new_notification", "notification": notification_data}, ensure_ascii=False)
+            .encode("utf-8")
+            .decode("utf-8")
+        )
 
 
 def send_notification(user_id, notification_data):  # type: ignore
