@@ -1,6 +1,8 @@
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models.expressions import F
 from django.http.response import JsonResponse
+from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -8,9 +10,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User
+from .models import HeartUsedLog, User
 from .serializers import (
     ErrorResponseSerializer,
+    HeartUsedLogListSerializer,
+    HeartUsedLogSerializer,
     UserHeartUpdateSerializer,
     UserUpdateSerializer,
 )
@@ -124,3 +128,51 @@ class UserHeartView(APIView):
             serializer = UserHeartUpdateSerializer(user)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(  # type:ignore
+        operation_summary="하트 사용 로그 페이지네이션",
+        operation_description="모든 하트 사용 로그를 페이지네이션을 통해 원하는 페이지의 로그 내역을 응답합니다.",
+        manual_parameters=[
+            openapi.Parameter(
+                "page", openapi.IN_QUERY, description="페이지 번호", type=openapi.TYPE_INTEGER, required=True
+            ),
+            openapi.Parameter(
+                "size", openapi.IN_QUERY, description="페이지 당 게시글 개수", type=openapi.TYPE_INTEGER, required=True
+            ),
+        ],
+        request_body=no_body,
+        responses={200: HeartUsedLogListSerializer},
+    )
+    def get(self, request):
+        page = int(self.request.query_params.get("page", 1))
+        size = int(self.request.query_params.get("size", 1))
+        queryset = HeartUsedLog.objects.filter(user=request.user).order_by("-created_at")
+
+        # 캐시 키 생성
+        cache_key = f"used_log_count_{request.user.id}"
+        # 캐시된 count 확인
+        total_count = cache.get(cache_key)
+        if total_count is None:
+            total_count = queryset.count()
+            # count 결과를 캐시에 5분간 저장
+            cache.set(cache_key, total_count)
+
+        start = (page - 1) * size
+        end = min(start + size, total_count)
+        paginated_queryset = queryset[start:end]
+
+        result_list = []
+        for used_log in paginated_queryset:
+            serializer = HeartUsedLogSerializer(instance=used_log)
+            result_list.append(serializer.data)
+        response_serializer = HeartUsedLogListSerializer(
+            data={
+                "heart_used_logs": result_list,
+                "page": page,
+                "size": size,
+                "total_count": total_count,
+                "total_pages": (total_count + size - 1) // size,
+            }
+        )
+        response_serializer.is_valid(raise_exception=True)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)

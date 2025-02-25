@@ -61,7 +61,7 @@ class BankTransferView(APIView):
                 "depositor_name": payments.bank_transfer.name,
                 "deposit_amount": payments.amount,
                 "heart_count": int("".join([i for i in payments.order.product.name if i.isdigit()])),
-                "payments_id": payments.id,
+                "payment_id": payments.id,
             }
             res_serializer = AdminAccountSerializer(data=data)
             res_serializer.is_valid(raise_exception=True)
@@ -108,7 +108,7 @@ class BankTransferView(APIView):
         for bank_log in paginated_queryset:
             data = {
                 "product_id": bank_log.order.product.id,
-                "payments_id": bank_log.id,
+                "payment_id": bank_log.id,
                 "purchase_date": bank_log.created_at,
                 "payment_amount": bank_log.amount,
                 "payment_status": bank_log.bank_transfer.status,
@@ -151,7 +151,7 @@ class BankTransferIdView(APIView):
             "depositor_name": bank_payments.bank_transfer.name,
             "deposit_amount": bank_payments.amount,
             "heart_count": int("".join([i for i in bank_payments.order.product.name if i.isdigit()])),
-            "payments_id": payment_id,
+            "payment_id": payment_id,
         }
         res_serializer = AdminAccountSerializer(data=data)
         res_serializer.is_valid(raise_exception=True)

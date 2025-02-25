@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+from helpers.models import BaseModel
+
 
 class User(AbstractUser):
     USERNAME_FIELD = "email"
@@ -22,6 +24,12 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+
+
+class HeartUsedLog(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    heart_count = models.IntegerField()
+    chat_room_id = models.IntegerField()
 
 
 class Questionnaire(models.Model):
