@@ -38,7 +38,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
                 "title": noti.title,
                 "url": noti.content,
                 "category": noti.category if noti.category else None,
-                "created_at": noti.created_at,
+                "created_at": noti.created_at.isoformat(),
             }
             for noti in unread_notifications
         ]
