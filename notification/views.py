@@ -44,7 +44,7 @@ def create_notification(request: Request) -> Response:
                         "title": notification.title,
                         "url": notification.content,
                         "category": notification.category if notification.category else None,
-                        "created_at": notification.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                        "created_at": notification.created_at.isoformat(),
                     },
                     ensure_ascii=False,
                 ),
