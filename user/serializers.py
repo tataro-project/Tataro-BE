@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from rest_framework import serializers
 
-from .models import User
+from .models import HeartUsedLog, User
 
 
 # User 모델의 데이터를 JSON 형식으로 변환하거나
@@ -50,3 +50,19 @@ class UserHeartUpdateSerializer(serializers.ModelSerializer[User]):
 class ErrorResponseSerializer(serializers.Serializer):  # type:ignore
     error = serializers.CharField()
     current_heart_count = serializers.IntegerField(required=False)
+
+
+class HeartUsedLogSerializer(serializers.ModelSerializer[HeartUsedLog]):
+    created_at = serializers.DateTimeField()
+
+    class Meta:
+        model = HeartUsedLog
+        fields = ["heart_count", "chat_room_id", "created_at"]
+
+
+class HeartUsedLogListSerializer(serializers.Serializer[HeartUsedLogSerializer]):
+    page = serializers.IntegerField()
+    size = serializers.IntegerField()
+    total_count = serializers.IntegerField()
+    total_pages = serializers.IntegerField()
+    heart_used_logs = HeartUsedLogSerializer(many=True)

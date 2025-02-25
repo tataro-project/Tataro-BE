@@ -20,6 +20,7 @@ from tarot.serializers import (
     TaroChatLogSerializer,
     TaroChatRoomResponseSerializer,
 )
+from user.models import HeartUsedLog
 
 
 # Create your views here.
@@ -44,6 +45,12 @@ class TarotInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
         cache.set(f"taro_chat_rooms_count_{request.user.id}", total_count, 300)
         content = request.data.get("content")
         if isinstance(content, str) and chat_content:
+            # 하트 사용내역 저장
+            HeartUsedLog(user=request.user, heart_count=10, chat_room_id=chat_content.room_id).save()  # type:ignore
+            # 내역 새로 생성될때 캐쉬 업데이트
+            total_count = HeartUsedLog.objects.filter(user=request.user).count()  # type:ignore
+            cache.set(f"used_log_count_{request.user.id}", total_count)
+
             prompt = TaroChatContents.init_tarot_prompt(content)
             print("prompt=", prompt)
             init_serializer = self.get_serializer(
@@ -74,6 +81,12 @@ class TarotAfterInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
             chat_content = serializer.save()
         content = request.data.get("content")
         if isinstance(content, str) and chat_content:
+            # 하트 사용내역 저장
+            HeartUsedLog(user=request.user, heart_count=10, chat_room_id=chat_content.room_id).save()  # type:ignore
+            # 내역 새로 생성될때 캐쉬 업데이트
+            total_count = HeartUsedLog.objects.filter(user=request.user).count()  # type:ignore
+            cache.set(f"used_log_count_{request.user.id}", total_count)
+
             prompt = TaroChatContents.init_tarot_prompt(content)
             print("prompt=", prompt)
             init_serializer = self.get_serializer(
