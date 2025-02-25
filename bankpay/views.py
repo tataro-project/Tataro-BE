@@ -58,6 +58,9 @@ class BankTransferView(APIView):
                 "admin_name": ADMIN_NAME,
                 "admin_bank": ADMIN_BANK,
                 "deadline": bank_transfer.deadline,
+                "depositor_name": payments.bank_transfer.name,
+                "deposit_amount": payments.amount,
+                "heart_count": int("".join([i for i in payments.order.product.name if i.isdigit()])),
                 "payments_id": payments.id,
             }
             res_serializer = AdminAccountSerializer(data=data)
@@ -137,7 +140,7 @@ class BankTransferIdView(APIView):
         query = (
             BankPayments.objects.prefetch_related("bank_transfer")
             .prefetch_related("order__product")
-            .filter(user=request.user, bank_transfer_id=payment_id)
+            .filter(user=request.user, pk=payment_id)
         )
         bank_payments = get_object_or_404(query)
         data = {
