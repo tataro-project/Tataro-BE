@@ -81,6 +81,7 @@ class TarotAfterInitViewSet(viewsets.GenericViewSet["TaroChatContents"]):
             chat_content = serializer.save()
         content = request.data.get("content")
         if isinstance(content, str) and chat_content:
+            # 이 부분 나중에 따로 빼기
             # 하트 사용내역 저장
             HeartUsedLog(user=request.user, heart_count=10, chat_room_id=chat_content.room_id).save()  # type:ignore
             # 내역 새로 생성될때 캐쉬 업데이트

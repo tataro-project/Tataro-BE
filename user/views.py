@@ -48,10 +48,10 @@ class UserView(APIView):
         operation_summary="유저 정보 수정",
         operation_description='유저의 "nickname", "gender", "birthday"를 수정합니다.',
         request_body=UserUpdateSerializer,
-        responses={201: UserUpdateSerializer, 400: "잘못된 요청"},
+        responses={200: UserUpdateSerializer, 400: "잘못된 요청"},
     )
     # 사용자 정보 수정을 처리하는 PUT 메서드
-    def put(self, request: Request) -> Response:
+    def put(self, request: Request) -> Response:  # type:ignore
         try:
             # 현재 로그인한 사용자 정보 조회
             user = User.objects.get(id=request.user.id)
@@ -59,14 +59,11 @@ class UserView(APIView):
             serializer = UserUpdateSerializer(user, data=request.data, partial=True)
 
             # 데이터 유효성 검사
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 # 유효한 데이터를 DB에 저장
                 serializer.save()
                 # 성공 응답 반환
-                return Response({"message": "회원 정보 수정 성공", "status": "success"}, status=status.HTTP_200_OK)
-
-            # 유효성 검사 실패시 에러 응답
-            return Response({"message": "올바르지 못한 시도입니다"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
         # 사용자를 찾을 수 없는 경우 처리
         except User.DoesNotExist:
