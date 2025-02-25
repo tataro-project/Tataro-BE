@@ -16,7 +16,7 @@ class UserUpdateSerializer(serializers.ModelSerializer[User]):
         model = User
         # 시리얼라이저에 포함할 필드들을 지정
 
-        fields = ["id", "nickname", "email", "gender", "birthday", "social_type"]
+        fields = ["id", "nickname", "email", "gender", "birthday", "social_type", "heart_count"]
 
         # 수정 불가능한 필드들 지정 (읽기 전용)
         read_only_fields = ["id", "email", "social_type"]
