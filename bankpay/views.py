@@ -50,7 +50,7 @@ class BankTransferView(APIView):
                 status="pending",
             )
             # 내역 새로 생성될때 캐쉬 업데이트
-            total_count = BankPayments.objects.count()
+            total_count = BankPayments.objects.filter(user=request.user).count()
             cache.set(f"pay_log_count_{request.user.id}", total_count)
 
             data = {
