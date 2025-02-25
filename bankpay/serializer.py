@@ -17,6 +17,9 @@ class AdminAccountSerializer(serializers.Serializer):  # type:ignore
     admin_bank = serializers.CharField(help_text="관리자 계좌의 은행")
     deadline = serializers.DateTimeField()
     payments_id = serializers.IntegerField()
+    depositor_name = serializers.CharField()
+    deposit_amount = serializers.IntegerField()
+    heart_count = serializers.IntegerField()
 
 
 class BankTransferGetResponseSerializer(serializers.Serializer):  # type:ignore
