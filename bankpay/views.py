@@ -134,12 +134,20 @@ class BankTransferIdView(APIView):
         responses={201: AdminAccountSerializer},
     )
     def get(self, request, payment_id):
-        bank_transfer = get_object_or_404(BankTransfer, pk=payment_id)
+        query = (
+            BankPayments.objects.prefetch_related("bank_transfer")
+            .prefetch_related("order__product")
+            .filter(user=request.user, bank_transfer_id=payment_id)
+        )
+        bank_payments = get_object_or_404(query)
         data = {
             "admin_account": ADMIN_ACCOUNT,
             "admin_name": ADMIN_NAME,
             "admin_bank": ADMIN_BANK,
-            "deadline": bank_transfer.deadline,
+            "deadline": bank_payments.bank_transfer.deadline,
+            "depositor_name": bank_payments.bank_transfer.name,
+            "deposit_amount": bank_payments.amount,
+            "heart_count": int("".join([i for i in bank_payments.order.product.name if i.isdigit()])),
             "payments_id": payment_id,
         }
         res_serializer = AdminAccountSerializer(data=data)
