@@ -93,6 +93,31 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
     elif request.method == "PUT":
         if cast(User, request.user) != review.user:
             return Response({"error": "수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN)
+
+        # 이미지 파일이 요청에 포함되어 있는지 확인
+        new_image = request.FILES.get("image")
+
+        if new_image:
+            # 기존 이미지가 있는지 확인
+            if review.img_url:
+                try:
+                    # 기존 이미지 삭제
+                    delete_from_ncp(review.img_url)
+                except Exception as e:
+                    return Response(
+                        {"error": f"기존 이미지 삭제 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+
+            # 새 이미지 업로드
+            try:
+                cate = "review"
+                new_img_url = upload_to_ncp(cate, new_image)
+                request.data["img_url"] = new_img_url
+            except Exception as e:
+                return Response(
+                    {"error": f"새 이미지 업로드 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
         serializer = ReviewSerializer(review, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
