@@ -119,7 +119,7 @@ def review_detail_update_delete(request: Request, review_id: int) -> Response:  
                     {"error": f"새 이미지 업로드 중 오류 발생: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
 
-        elif request_img_url == "" and review.img_url:
+        elif request_img_url is None and review.img_url:
             # 요청의 img_url이 빈 문자열이고, DB에 이미지가 있는 경우
             try:
                 delete_from_ncp(review.img_url)
