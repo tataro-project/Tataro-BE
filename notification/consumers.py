@@ -38,6 +38,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
                 "title": noti.title,
                 "url": noti.content,
                 "category": noti.category if noti.category else None,
+                "created_at": noti.created_at,
             }
             for noti in unread_notifications
         ]
@@ -78,6 +79,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):  # type: ignore
             Notification.objects.filter(is_active=True)
             .exclude(notiusers__read_users__contains=[user.id])
             .select_related("user")  # 'category' 대신 'user'만 사용
+            .order_by("-created_at")
         )
 
     async def new_notification(self, event):  # type: ignore

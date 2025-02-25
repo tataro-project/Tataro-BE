@@ -3,7 +3,6 @@ import json
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -11,9 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from user.models import User
-
-from .models import Notification, NotiUser
+from .models import NotiUser
 from .serializers import NotificationSerializer
 
 
