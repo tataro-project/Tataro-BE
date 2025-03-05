@@ -67,6 +67,10 @@
 
 ## 🧰 프로젝트 기술 스택
 
+### FE && BE && DEPLOY
+![tataro (1)](https://github.com/user-attachments/assets/b916eaba-5252-4144-8395-bf63f862be18)
+
+
 ### FE
 
 <div align=center>
