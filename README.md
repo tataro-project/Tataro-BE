@@ -37,6 +37,34 @@
 > 타타로는 이 불확실성을 해소하는데 도움을 주고, 사람들에게 공감과 위로를 제공하며, 새로운 시각과 결단력을 줍니다.
 > 연애 때문에 고민하는 사람들의 시간을 아껴주고, 사랑의 갈림길에서 더 나은 선택을 할 수 있도록 도와주는 서비스입니다.
 
+---
+
+## 🔗 배포 링크
+
+> ### [타타로](https://hakunamatatarot.com/)
+
+## 🗂️ 발표 자료
+
+> ### [타타로 PPT](https://github.com/user-attachments/files/19087811/3._.pdf)
+
+## 🖥️ 서비스 소개
+
+|   타로상담  |  웹소켓  |   알림   |
+|:--------:|:------:|:--------:|
+| <img src="https://github.com/user-attachments/assets/13c226d6-124d-4bd5-b534-c42f26a180ce" alt="Taro"> |   <img src="https://github.com/user-attachments/assets/8050bc19-67bb-47a6-8056-dc338e004dd5" alt="WebSocket">  | <img src="https://github.com/user-attachments/assets/d4cfea81-a80d-4c26-9e4d-871fd81ee932" alt="Alarm"> |
+
+
+
+|                                                                                                          메인페이지                                                                                                           |                                                                                                              리뷰작성                                                                                                               |                                                                                                             리뷰수정                                                                                                             |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| <img src="https://github.com/user-attachments/assets/cf273535-7ed0-4713-880b-4bae0ba4e1ac" alt="MainPage"> | <img src="https://github.com/user-attachments/assets/3172f05f-6367-4ab7-ac9a-e1d0bb37c7bb" alt="ReviewCreate"> | <img src="https://github.com/user-attachments/assets/ac757c63-79b4-4924-8660-fd741f198023" alt="ReviewUpdate"> |
+
+|      로딩스피너      |     404페이지    |
+|:-------:|:---------:|
+| <img src="https://github.com/user-attachments/assets/61a3f5ce-52af-4ddf-bd7a-da5e8028a96f" alt="LoadingSpiner"> | <img src="https://github.com/user-attachments/assets/7f823ad2-2c21-4abf-8521-985fab3b0875" alt="404Page"> |
+
+---
+
 ## 🧰 프로젝트 기술 스택
 
 ### FE
