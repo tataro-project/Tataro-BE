@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submitting to Korpay...</title>
+</head>
+<body onload="document.korpayForm.submit();">
+    <form name="korpayForm" action="{{ korpay_api_url }}" method="post">
+        <input type="hidden" name="payMethod" value="card">
+        <input type="hidden" name="id" value="{{ merchant_id }}">
+        <input type="hidden" name="goodsName" value="{{ goods_name }}">
+        <input type="hidden" name="orderNo" value="{{ moid }}">
+        <input type="hidden" name="amt" value="{{ price }}">
+        <input type="hidden" name="returnUrl" value="{{ return_url }}">
+        <input type="hidden" name="ediDate" value="{{ edi_date }}">
+        <input type="hidden" name="hashStr" value="{{ hash_str }}">
+        <input type="hidden" name="buyerName" value="{{ buyer_name }}">
+        <input type="hidden" name="buyerTel" value="{{ buyer_tel }}">
+        <input type="hidden" name="buyerEmail" value="{{ buyer_email }}">
+        <p>Redirecting to Korpay payment gateway...</p>
+        <noscript>
+            <button type="submit">Click here to continue to Korpay</button>
+        </noscript>
+    </form>
+</body>
+</html>
